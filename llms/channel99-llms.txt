@@ -1,0 +1,39 @@
+---
+generated: '2026-07-18'
+method: searched
+source: https://www.channel99.com/llms.txt
+---
+# Official Home Page
+
+> Channel99 is B2B marketing attribution software using AI to recommend ways to improve campaign ROI and increase pipeline.
+
+The site covers solutions for analytics, attribution, ad verification, and campaign scoring, plus the underlying technology and company information for B2B marketing teams.
+
+## Documentation
+
+- [Getting Started](https://www.channel99.com/articles/getting-started): Article on gaining a comprehensive view of a B2B deal.
+
+## Main
+
+- [Solutions](https://channel99.com/solutions): Overview of B2B marketing solutions for improving ROI and pipeline predictability.
+- [Technology](https://channel99.com/technology): Overview of technology addressing data and attribution challenges for B2B marketers.
+- [Customers](https://channel99.com/customers): Customer overview serving large and fast-growing marketing organizations.
+- [Partners](https://channel99.com/partners): Partners page; covers privacy-forward, cookieless solutions for B2B marketers.
+- [Resources](https://channel99.com/resources): Blog and resources with insights and trends for B2B marketers.
+- [Company](https://channel99.com/company): About the company, its culture, and AI-enabled B2B marketing approach.
+- [Request a Demo](https://channel99.com/company/request-demo): Request a personalized demo or watch a short product demo.
+- [Request a Demo](https://www.channel99.com/company/request-demo): Request a personalized demo or watch a short product demo.
+- [B2B Analytics](https://channel99.com/solutions/b2b-analytics): B2B digital analytics with account identification for website analytics and advertising measurement.
+- [View-Thru](https://channel99.com/solutions/view-thru): View-thru solution revealing the actual source of direct web traffic for attribution.
+- [Attribution](https://channel99.com/solutions/attribution): Predictive B2B attribution using AI to recommend campaign changes for pipeline impact.
+- [Ad Verification](https://channel99.com/solutions/ad-verification): B2B ad verification across channels and vendors for reach, engagement, and targeting efficiency.
+- [Campaign Scoring](https://channel99.com/solutions/campaign-scoring): Measure and score B2B campaigns and vendors by pipeline influence and engagement.
+- [Artificial Intelligence](https://channel99.com/technology/artificial-intelligence): AI technology recommending how to improve B2B campaigns for higher pipeline and ROI.
+- [Account ID](https://channel99.com/technology/account-id): Anonymous account identification and deanonymization technology for B2B marketing websites.
+
+## Optional
+
+- [Privacy & Trust](https://channel99.com/company/privacy): Privacy and trust page on protecting user and customer data without cookies.
+- [Contact Us](https://channel99.com/company/contact): Contact page with form and LinkedIn outreach options.
+- [Privacy](https://www.channel99.com/company/privacy): Privacy and trust page on protecting user and customer data without cookies.
+- [Contact](https://www.channel99.com/company/contact): Contact page with form and LinkedIn outreach options.
