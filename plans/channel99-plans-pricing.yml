@@ -1,0 +1,57 @@
+generated: '2026-08-12'
+method: searched
+source: https://www.channel99.com/company/request-demo
+docs: https://www.channel99.com/company/request-demo
+
+note: >-
+  Channel99 publishes no pricing. There is no pricing page on channel99.com - /pricing,
+  /plans and /company/pricing all return HTTP 404 - the site navigation has no pricing entry,
+  and the llms.txt Channel99 serves for agents lists no pricing URL either. The only commercial
+  route published is "Request a Demo". Tier names do surface in the product release notes
+  (a June 2025 feature is annotated "Plan: All"), which confirms that tiers exist internally
+  without any of them being priced or described publicly. Nothing about the Reporting API,
+  the MCP server or the Snowflake data share carries a published price, quota or overage.
+
+pricing_model: contact-sales
+public_pricing: false
+self_service_signup: false
+self_service_note: >-
+  https://app.channel99.com/sign-up exists but provisions users into an existing Channel99
+  instance; there is no published self-serve purchase path and no free tier.
+free_tier: false
+trial: unknown
+
+plans: []
+plan_count: 0
+
+api_access_commercials:
+  reporting_api:
+    priced_publicly: false
+    entitlement: >-
+      Access requires an active Channel99 account plus an M2M client_id and client_secret issued
+      by Channel99 for a specific instance.
+    metering_published: false
+    rate_limits_published: true
+    rate_limits_ref: rate-limits/channel99-rate-limits.yml
+    add_ons:
+    - name: Channel99 IP API
+      note: >-
+        "Access to separately permissioned services, including the Channel99 IP API, is not
+        enabled unless explicitly granted." Separately entitled, price not published.
+  mcp_server:
+    priced_publicly: false
+    note: >-
+      The ChatGPT connector shipped as a beta "limited to pilot customers" and requires an MCP
+      Server; no plan requirement or price is published.
+  snowflake_data_share:
+    priced_publicly: false
+
+evidence:
+- url: https://www.channel99.com/pricing
+  status: 404
+- url: https://www.channel99.com/plans
+  status: 404
+- url: https://www.channel99.com/company/pricing
+  status: 404
+- url: https://www.channel99.com/company/request-demo
+  status: 200

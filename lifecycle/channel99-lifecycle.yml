@@ -1,0 +1,91 @@
+generated: '2026-08-12'
+method: searched
+source: https://support.channel99.com/hc/en-us/articles/31620090788507-Service-Level-Expectations
+docs:
+- https://support.channel99.com/hc/en-us/articles/31620090788507-Service-Level-Expectations
+- https://support.channel99.com/hc/en-us/articles/49205911053595-Channel99-Status-Page
+derived_from: openapi/channel99-pulsar-openapi.json
+
+versioning:
+  scheme: unversioned-paths
+  current_version: 1.0.0
+  version_location: info.version in the OpenAPI document only
+  version_header: null
+  policy_published: false
+  note: >-
+    Pulsar paths carry no version segment and no version header is documented, so there is no
+    published mechanism by which a client would pin a version or detect that it moved. This is
+    the weakest part of Channel99's otherwise solid API contract.
+
+deprecation:
+  policy_published: false
+  sunset_header: false
+  deprecation_header: false
+  rfc8594: false
+  deprecated_operations: []
+  deprecated_operation_count: 0
+  note: >-
+    No operation in the OpenAPI is marked deprecated: true, and no deprecation or sunset policy
+    is published anywhere on channel99.com or in the help centre. Entity-level soft deletion IS
+    modelled in the data (is_deleted on Audience, AdCampaign, AdGroup, Ad, AdUnit), but that is
+    record lifecycle, not API lifecycle. No Deprecation pointer is emitted.
+
+status_page:
+  url: https://channel99.freshstatus.io/
+  provider: Freshstatus
+  http_status: 200
+  subscribable: true
+  source: https://support.channel99.com/hc/en-us/articles/31620090788507-Service-Level-Expectations
+  quote: >-
+    "Customers may receive updates regarding Channel99 availability by registering for updates
+    via https://channel99.freshstatus.io/"
+  machine_readable_feed: false
+  machine_readable_note: >-
+    The status page is a Next.js client-rendered app; no public JSON/RSS status API responded
+    anonymously (public-api.freshstatus.io returned HTTP 403 without an account key), so an
+    agent cannot poll Channel99's availability programmatically.
+
+sla:
+  published: true
+  contractual: conditional
+  contractual_note: >-
+    "Service level expectations ... only applies to Channel99 customers when explicitly
+    incorporated into your agreements for the purchase of Channel99 Services."
+  uptime_target: '99%'
+  scheduled_downtime_cap: 4 hours per calendar month
+  scheduled_downtime_note: Channel99 targets off-hours for scheduled maintenance.
+  support_response_time: 24 hours on weekdays and non-holidays
+  support_channel: support@channel99.com
+  support_center: 24/7 self-service help centre plus an in-app AI support agent
+  credits_published: false
+  source: https://support.channel99.com/hc/en-us/articles/31620090788507-Service-Level-Expectations
+
+release_cadence:
+  style: monthly product release notes
+  location: https://support.channel99.com/hc/en-us
+  earliest_recorded: '2022-12'
+  latest_recorded: '2026-01'
+  detail: changelog/channel99-changelog.yml
+
+api_lifecycle_stages:
+- surface: Pulsar Reporting API
+  stage: generally-available
+  evidence: Documented developer guide plus a served OpenAPI; credentials issued per customer.
+- surface: Channel99 MCP Server
+  stage: generally-available
+  evidence: Shipped in the January 2026 release and documented in the help centre.
+- surface: ChatGPT connector
+  stage: generally-available
+  evidence: '"ChatGPT ( AVAILABLE NOW)" - MCP Server General FAQ.'
+- surface: Claude connector
+  stage: beta
+  evidence: '"Claude (Beta)" - MCP Server General FAQ.'
+- surface: Sōl platform API
+  stage: internal
+  evidence: >-
+    Public root discovery document at https://sol.channel99.com/ lists Swagger, GraphQL Studio
+    and health links, all of which return HTTP 401. Not documented for customers.
+
+data_retention:
+  policy_published: partial
+  note: '"Website ingestion data can be removed on request." - MCP Server General FAQ.'

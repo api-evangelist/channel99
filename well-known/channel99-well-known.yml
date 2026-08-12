@@ -1,0 +1,229 @@
+generated: '2026-08-12'
+method: probed
+source: live unauthenticated GET of /.well-known/* on every Channel99 host named in apis.yml, the OpenAPI servers, the app bundle and the support documentation
+note: >-
+  Channel99 serves two real machine-readable well-known documents, both on the MCP host
+  mcp.channel99.com: RFC 9728 OAuth Protected Resource metadata and RFC 8414 OAuth
+  Authorization Server metadata. Both delegate to a Stytch-operated authorization server on a
+  Channel99-controlled subdomain (api.stytch.app.channel99.com), whose OpenID Provider
+  configuration is also public. The marketing site (channel99.com / www.channel99.com) 404s on
+  every well-known path. app.channel99.com answers HTTP 200 on EVERY /.well-known/* path with
+  the same React SPA HTML shell - that is an SPA catch-all, not a served document, and it is
+  recorded below as a miss. No security.txt is published on any host, so no SecurityTxt pointer
+  is emitted.
+
+hosts:
+- host: mcp.channel99.com
+  role: MCP server (Model Context Protocol)
+  paths:
+  - path: /.well-known/oauth-protected-resource
+    status: 200
+    content_type: application/json
+    document: true
+    file: well-known/channel99-mcp-oauth-protected-resource.json
+    spec: RFC 9728 OAuth 2.0 Protected Resource Metadata
+  - path: /.well-known/oauth-authorization-server
+    status: 200
+    content_type: application/json
+    document: true
+    file: well-known/channel99-mcp-oauth-authorization-server.json
+    spec: RFC 8414 OAuth 2.0 Authorization Server Metadata
+  - path: /.well-known/openid-configuration
+    status: 404
+    document: false
+  - path: /.well-known/security.txt
+    status: 404
+    document: false
+  - path: /.well-known/api-catalog
+    status: 404
+    document: false
+  - path: /.well-known/ai-plugin.json
+    status: 404
+    document: false
+  - path: /.well-known/agent-card.json
+    status: 404
+    document: false
+  - path: /.well-known/agent.json
+    status: 404
+    document: false
+
+- host: api.stytch.app.channel99.com
+  role: Authorization server (Stytch, CNAME'd onto a Channel99 subdomain) named as the issuer by the MCP protected-resource metadata
+  paths:
+  - path: /.well-known/openid-configuration
+    status: 200
+    content_type: application/json
+    document: true
+    file: well-known/channel99-stytch-openid-configuration.json
+    spec: OpenID Connect Discovery 1.0
+  - path: /.well-known/oauth-authorization-server
+    status: 200
+    content_type: application/json
+    document: true
+    file: null
+    note: >-
+      Served and valid, but it is the same Stytch issuer document already captured above via the
+      MCP host; not duplicated to disk.
+
+- host: pulsar.channel99.com
+  role: Reporting / Bulk Data Transfer REST API (the Pulsar API)
+  paths:
+  - path: /.well-known/security.txt
+    status: 401
+    document: false
+    note: Host requires the x-client-id header on every route; returns err:pulsar.core.missing-header.
+  - path: /.well-known/openid-configuration
+    status: 401
+    document: false
+  - path: /.well-known/oauth-authorization-server
+    status: 401
+    document: false
+  - path: /.well-known/agent-card.json
+    status: 401
+    document: false
+
+- host: sol.channel99.com
+  role: Sōl platform API (internal/gated; root discovery document is public)
+  paths:
+  - path: /.well-known/oauth-protected-resource
+    status: 401
+    document: false
+  - path: /.well-known/oauth-authorization-server
+    status: 401
+    document: false
+  - path: /.well-known/security.txt
+    status: 401
+    document: false
+  - path: /.well-known/api-catalog
+    status: 401
+    document: false
+  - path: /.well-known/agent-card.json
+    status: 401
+    document: false
+  - path: /.well-known/agent.json
+    status: 401
+    document: false
+  - path: /.well-known/openid-configuration
+    status: 401
+    document: false
+  - path: /.well-known/ai-plugin.json
+    status: 401
+    document: false
+
+- host: channel99.com
+  role: Marketing site
+  paths:
+  - path: /.well-known/security.txt
+    status: 404
+    document: false
+  - path: /.well-known/openid-configuration
+    status: 404
+    document: false
+  - path: /.well-known/oauth-authorization-server
+    status: 404
+    document: false
+  - path: /.well-known/oauth-protected-resource
+    status: 404
+    document: false
+  - path: /.well-known/api-catalog
+    status: 404
+    document: false
+  - path: /.well-known/ai-plugin.json
+    status: 404
+    document: false
+  - path: /.well-known/agent-card.json
+    status: 404
+    document: false
+  - path: /.well-known/agent.json
+    status: 404
+    document: false
+
+- host: www.channel99.com
+  role: Marketing site (www)
+  paths:
+  - path: /.well-known/security.txt
+    status: 404
+    document: false
+  - path: /.well-known/openid-configuration
+    status: 404
+    document: false
+  - path: /.well-known/oauth-authorization-server
+    status: 404
+    document: false
+  - path: /.well-known/api-catalog
+    status: 404
+    document: false
+  - path: /.well-known/ai-plugin.json
+    status: 404
+    document: false
+  - path: /.well-known/agent-card.json
+    status: 404
+    document: false
+  - path: /.well-known/agent.json
+    status: 404
+    document: false
+
+- host: app.channel99.com
+  role: Web application (React SPA)
+  spa_catch_all: true
+  paths:
+  - path: /.well-known/security.txt
+    status: 200
+    content_type: text/html
+    document: false
+    note: SPA catch-all - identical index.html shell returned for every path. Not a document.
+  - path: /.well-known/openid-configuration
+    status: 200
+    content_type: text/html
+    document: false
+    note: SPA catch-all.
+  - path: /.well-known/oauth-authorization-server
+    status: 200
+    content_type: text/html
+    document: false
+    note: SPA catch-all.
+  - path: /.well-known/oauth-protected-resource
+    status: 200
+    content_type: text/html
+    document: false
+    note: SPA catch-all.
+  - path: /.well-known/api-catalog
+    status: 200
+    content_type: text/html
+    document: false
+    note: SPA catch-all.
+  - path: /.well-known/ai-plugin.json
+    status: 200
+    content_type: text/html
+    document: false
+    note: SPA catch-all.
+  - path: /.well-known/agent-card.json
+    status: 200
+    content_type: text/html
+    document: false
+    note: SPA catch-all - HTML, not an AgentCard object. No AgentCard pointer emitted.
+  - path: /.well-known/agent.json
+    status: 200
+    content_type: text/html
+    document: false
+    note: SPA catch-all.
+
+- host: support.channel99.com
+  role: Zendesk help center
+  paths:
+  - path: /.well-known/security.txt
+    status: 404
+    document: false
+  - path: /.well-known/agent-card.json
+    status: 404
+    document: false
+
+summary:
+  hosts_probed: 8
+  documents_found: 3
+  security_txt: false
+  api_catalog: false
+  agent_card: false
+  ai_plugin: false
+  oauth_metadata: true
+  openid_configuration: true

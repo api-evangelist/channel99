@@ -1,0 +1,53 @@
+generated: '2026-08-12'
+method: probed
+source: https://mcp.channel99.com/.well-known/oauth-authorization-server
+docs: https://support.channel99.com/hc/en-us/articles/47105598392475-MCP-Server-General-FAQ
+note: >-
+  Channel99 publishes no scopes reference page. These scopes are read verbatim from the two
+  RFC 8414 authorization-server metadata documents Channel99 serves - the resource-scoped list
+  advertised by the MCP server, and the wider list advertised by the Stytch authorization server
+  that backs the web application. The Pulsar Reporting API does NOT use OAuth scopes: it uses an
+  M2M client_credentials exchange whose authorization is carried entirely by the tenant binding
+  of the client_id, so there is nothing scope-shaped to record for it.
+
+authorization_servers:
+- issuer: https://api.stytch.app.channel99.com
+  metadata: https://mcp.channel99.com/.well-known/oauth-authorization-server
+  protected_resource: https://mcp.channel99.com
+  applies_to: Channel99 MCP Server
+  scopes:
+  - name: openid
+    description: Authenticate the user and issue an OpenID Connect ID token.
+  - name: email
+    description: Read the authenticated user's email address.
+  - name: profile
+    description: Read the authenticated user's basic profile.
+
+- issuer: https://api.stytch.app.channel99.com
+  metadata: https://api.stytch.app.channel99.com/.well-known/openid-configuration
+  applies_to: Channel99 web application (app.channel99.com)
+  scopes:
+  - name: openid
+    description: Authenticate the user and issue an OpenID Connect ID token.
+  - name: profile
+    description: Read the authenticated user's basic profile.
+  - name: email
+    description: Read the authenticated user's email address.
+  - name: phone
+    description: Read the authenticated user's phone number.
+  - name: offline_access
+    description: Issue a refresh token so the client can act after the session token expires.
+  - name: full_access
+    description: >-
+      Stytch's catch-all scope granting the full set of session permissions for the
+      organization member. No Channel99 documentation describes narrower resource scopes.
+
+granularity:
+  resource_scopes_published: false
+  assessment: >-
+    Neither authorization server publishes resource-level scopes (nothing of the form
+    visits:read or audiences:write). Authorization on the MCP surface is coarse - the FAQ states
+    the connection is read-only across the tenant's data, enforced server-side rather than
+    expressed as scopes a client can request or a user can review at consent time.
+
+scope_count: 6

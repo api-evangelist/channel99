@@ -1,0 +1,148 @@
+generated: '2026-08-12'
+method: searched
+source: https://support.channel99.com/hc/en-us/articles/49766041989787-Channel99-Reporting-API-Developer-Guide
+derived_from: openapi/channel99-pulsar-openapi.json
+docs:
+- https://pulsar.channel99.com/docs/#/
+- https://support.channel99.com/hc/en-us/articles/49766041989787-Channel99-Reporting-API-Developer-Guide
+
+scope: >-
+  Cross-cutting runtime semantics of the Pulsar API (https://pulsar.channel99.com), Channel99's
+  Bulk Data Transfer REST API. The MCP and Sōl surfaces are auth-gated and are noted only where
+  their behaviour is observable anonymously.
+
+auth:
+  style: bearer-jwt-plus-client-header
+  header: 'Authorization: Bearer <access_token>'
+  companion_header: 'x-client-id: <client_id>'
+  companion_required: true
+  token_endpoint: https://pulsar.channel99.com/auth/token
+  token_lifetime_seconds: 3600
+  refresh_token: false
+  detail: authentication/channel99-authentication.yml
+
+idempotency:
+  supported: false
+  header: null
+  detail: >-
+    Channel99 publishes no idempotency key, no request-replay window and no retry-safety
+    guarantee. In practice the surface is almost entirely read-only - 16 of 17 operations are
+    GETs, which are idempotent by HTTP semantics - and the one POST (/auth/token) mints a new
+    token on every call rather than returning a cached one. There is nothing to make idempotent
+    yet, but there is also no published contract, so no Idempotency pointer is claimed.
+
+pagination:
+  style: cursor
+  request_params:
+  - name: cursor
+    in: query
+    description: Opaque token taken from the previous response's nextCursor. Omit on the first page.
+  - name: limit
+    in: query
+    default: 200
+    maximum: 1000
+    minimum: 1
+    error_on_exceed: HTTP 400 err:pulsar.request.invalid-limit
+  response_fields:
+  - name: data
+    description: Array of records for this page.
+  - name: nextCursor
+    description: Pass as cursor for the next page, or null when there are no more results.
+  applies_to: All /events/* list operations (visits, pageviews, impressions, intents)
+  dimension_endpoints: >-
+    The /dimensions/* endpoints return whole lists rather than cursor pages - the developer
+    guide recommends caching these lookup ids.
+  guidance:
+  - Use a reasonable page size.
+  - Continue requesting pages until nextCursor is null.
+  - Store the date range and filters used for each export.
+  - Retry failed pages rather than restarting the full export.
+
+filtering:
+  style: deepObject
+  syntax: filter[<field>][<op>]=<value>
+  combination: Multiple filters are ANDed.
+  operators:
+    string: [eq, ne, in, notIn, isNull, isNotNull]
+    number: [eq, ne, gt, gte, lt, lte, in, notIn, isNull, isNotNull]
+    boolean: [eq, ne, isNull, isNotNull]
+    date: [eq, ne, gt, gte, lt, lte, isNull, isNotNull]
+  multi_value: 'Comma-separated for in / notIn: filter[tag_id][in]=a,b,c'
+  null_ops: For isNull / isNotNull the value is ignored.
+  examples:
+  - filter[ad_unit_id][eq]=unt_abc123
+  - filter[is_deleted][eq]=false
+  - filter[event_date][gte]=2026-01-01
+  guidance: >-
+    Pass object IDs, not display names, unless the spec explicitly supports name-based filtering.
+
+sorting:
+  style: deepObject
+  syntax: sort[<field>]=asc|desc
+  single_field_only: true
+  sortable_fields_events: [event_date]
+  example: sort[event_date]=desc
+
+field_selection:
+  sparse_fieldsets: false
+  expansion: false
+  note: >-
+    No field-selection or expansion mechanism. Every list operation returns the full flat record
+    for its entity; joins are done client-side on the *_id foreign keys.
+
+date_handling:
+  format: ISO 8601
+  accepted:
+  - '2026-01-01'
+  - '2026-01-31T23:59:59Z'
+  guidance:
+  - Always send explicit start and end dates.
+  - Keep the end date later than the start date.
+  - Use the same timezone convention across all reporting jobs.
+  - Avoid open-ended ranges for large exports.
+
+metadata:
+  custom_metadata_fields: false
+
+tracing:
+  request_id_header: null
+  pulsar_note: >-
+    The Pulsar API returns no request-id header. Support tickets are asked to include the
+    endpoint, parameters, date range and the approximate time of the request instead - a manual
+    substitute for a correlation id.
+  sol_note: >-
+    The sibling Sōl API DOES emit a correlation header - x-request-id (observed value shape
+    sreq:___.prod.<id>), exposed via access-control-expose-headers. The Pulsar API does not.
+
+versioning:
+  scheme: none-in-path
+  spec_version: 1.0.0
+  version_header: null
+  detail: >-
+    Paths carry no version segment (/events/visits, not /v1/events/visits) and no version header
+    is documented. info.version in the OpenAPI reads 1.0.0. There is no published policy for how
+    a breaking change would be signalled - see lifecycle/channel99-lifecycle.yml.
+
+errors:
+  envelope: '{error, code, message}'
+  rfc9457: false
+  code_namespace: err:pulsar.<domain>.<condition>
+  detail: errors/channel99-problem-types.yml
+
+rate_limits:
+  signalled_via: Retry-After on HTTP 429
+  standard_headers: false
+  detail: rate-limits/channel99-rate-limits.yml
+
+content:
+  request_content_type: application/json
+  response_content_type: application/json
+  bulk_export_format: JSON pages (no CSV/Parquet export endpoint; bulk column-level export is
+    offered out-of-band through the Snowflake Secure Data Share)
+
+data_freshness:
+  documented: true
+  detail: >-
+    Reporting data depends on pixel activity, visit identification, ad-platform imports, CRM
+    imports, opportunity updates and audience refreshes. Channel99 publishes no numeric freshness
+    SLA; rule-based audiences are documented as refreshing on a 24-hour cadence.

@@ -1,0 +1,136 @@
+generated: '2026-08-12'
+method: probed
+source: https://mcp.channel99.com/.well-known/oauth-protected-resource
+docs:
+- https://support.channel99.com/hc/en-us/articles/46757387781275-Channel99-MCP-Server-Information
+- https://support.channel99.com/hc/en-us/articles/47105598392475-MCP-Server-General-FAQ
+- https://support.channel99.com/hc/en-us/articles/47096482901275-Channel99-Connection-to-Anthropic-Claude
+- https://www.channel99.com/articles/mcp-server-for-performance-marketing
+
+name: Channel99 MCP Server
+status: live
+hosted: true
+vendor_operated: true
+description: >-
+  Channel99 operates a first-party, remote Model Context Protocol server that exposes its
+  B2B marketing performance data - website visits, pixel impressions, vendor and channel
+  scores, audiences, account identity and pipeline influence - to an external LLM. The support
+  documentation describes it as a read-only, OAuth-secured connector, and the January 2026
+  product release adds a "guarded SQL-backed data interface" so a model can formulate runnable
+  queries against the customer's own tables. Channel99 publicly markets connectors for OpenAI
+  ChatGPT (generally available) and Anthropic Claude (beta).
+
+endpoints:
+- transport: streamable-http
+  url: https://mcp.channel99.com/mcp
+  method: POST
+  observed_status: 401
+  observed_body: '{"jsonrpc":"2.0","error":{"code":-32000,"message":"Missing Bearer token","rpcId":1}}'
+  note: >-
+    A real JSON-RPC error envelope, not an HTML shell - this confirms a live MCP endpoint that
+    requires an OAuth bearer token before tools/list will answer.
+- transport: websocket
+  url: wss://mcp.channel99.com/ws
+  note: >-
+    WebSocket transport used by the in-product AI assistant. Read out of the published
+    app.channel99.com JavaScript bundle, which constructs the socket with the Stytch
+    session_jwt as the subprotocol and identifies the client as {name: "Channel99",
+    version: "1.0.0"}.
+- transport: http
+  url: https://mcp.channel99.com/health
+  method: GET
+  observed_status: 200
+  observed_body: '{"success":true}'
+
+authentication:
+  standard: OAuth 2.1
+  source: https://support.channel99.com/hc/en-us/articles/47105598392475-MCP-Server-General-FAQ
+  protected_resource_metadata: https://mcp.channel99.com/.well-known/oauth-protected-resource
+  authorization_server_metadata: https://mcp.channel99.com/.well-known/oauth-authorization-server
+  issuer: https://api.stytch.app.channel99.com
+  authorization_endpoint: https://app.channel99.com/oauth/authorize
+  token_endpoint: https://api.stytch.app.channel99.com/v1/oauth2/token
+  scopes_supported:
+  - openid
+  - email
+  - profile
+  grant_types_supported:
+  - authorization_code
+  - refresh_token
+  code_challenge_methods_supported:
+  - S256
+  token_endpoint_auth_methods_supported:
+  - none
+  dynamic_client_registration: false
+  client_id_metadata_document_supported: true
+  identity_provider: Stytch (api.stytch.app.channel99.com, a Channel99-controlled subdomain)
+
+url_model: universal
+url_model_note: >-
+  The MCP Server General FAQ states the MCP URL is a single universal URL rather than a
+  per-tenant URL; tenant scoping is carried by the OAuth token.
+
+permissions:
+  read: true
+  write: false
+  source: >-
+    "What Read/Write Permissions does the MCP connection have to the Channel99 databases? Read Only"
+    - MCP Server General FAQ.
+
+privacy:
+  personal_data_shared: false
+  note: >-
+    Channel99 states no contact names, emails, usernames or passwords cross the MCP connection;
+    all data is shared at the company/domain level. Data is segregated database-per-customer.
+
+clients_supported:
+- name: OpenAI ChatGPT
+  status: generally-available
+- name: Anthropic Claude
+  status: beta
+- name: Microsoft Copilot
+  status: announced
+  source: https://www.prnewswire.com/news-releases/channel99-connects-marketing-intelligence-data-to-genai-platforms-enabling-a-new-generation-of-marketing-clouds-302696445.html
+
+tools:
+  enumerated: false
+  count: null
+  reason: >-
+    tools/list is OAuth-gated - an anonymous JSON-RPC tools/list returns HTTP 401
+    {"code":-32000,"message":"Missing Bearer token"}. Channel99 publishes no tool manifest,
+    llms.txt tool list or connector directory listing with tool names, so the tool names and
+    inputSchemas cannot be recorded without an authenticated introspection. NOT DERIVED AND NOT
+    GUESSED - see mcp/channel99-tool-crosswalk.yml for the surfaces that are readable.
+  data_surface_documented: true
+  data_surface_note: >-
+    Channel99 does document WHAT the MCP server can reach, if not the tool signatures: the FAQ
+    and the MCP Server Information article both say the MCP services are built over the same
+    schema published in the Snowflake Data Share documentation (fact tables Visit, Pageview,
+    Impression plus the ad/audience/company/vendor/channel dimension tables), which is the same
+    entity set the Pulsar REST API exposes.
+
+error_codes_observed:
+- code: err:mcp.internal-server-error
+  source: app.channel99.com JavaScript bundle
+- code: err:mcp.auth-failure
+  source: app.channel99.com JavaScript bundle
+- code: err:mcp.unknown-route
+  source: app.channel99.com JavaScript bundle
+- code: rate_limit_exceeded
+  source: app.channel99.com JavaScript bundle
+
+x-evidence:
+  fetched: '2026-08-12'
+  probes:
+  - url: https://mcp.channel99.com/mcp
+    method: POST
+    body: '{"jsonrpc":"2.0","id":1,"method":"tools/list"}'
+    status: 401
+  - url: https://mcp.channel99.com/health
+    status: 200
+  - url: https://mcp.channel99.com/.well-known/oauth-protected-resource
+    status: 200
+  - url: https://mcp.channel99.com/.well-known/oauth-authorization-server
+    status: 200
+  - url: https://mcp.channel99.com/
+    status: 404

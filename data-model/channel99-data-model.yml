@@ -1,0 +1,345 @@
+generated: '2026-08-12'
+method: derived
+source: openapi/channel99-pulsar-openapi.json
+docs: https://support.channel99.com/hc/en-us/articles/35162878162331-Channel99-Data-Share-Snowflake
+
+note: >-
+  Channel99's Pulsar API is an explicit star schema: four event fact entities (visit, pageview,
+  impression, intent) each carrying foreign keys into a set of small dimension entities
+  (company, audience, channel, vendor, and the ad hierarchy). Channel99 publishes the same shape
+  as a Snowflake Secure Data Share, described in its help centre as "a Fact + Dimensional table
+  structure", which corroborates the shape derived here from the spec. Relationships below are
+  derived from id-reference fields, not from $ref links - the spec inlines flat objects rather
+  than nesting them.
+
+id_conventions:
+  style: snake_case suffixed with _id
+  prefixed_ids_documented: true
+  examples:
+  - unt_abc123 (ad unit, from the filter examples in the spec)
+  - ad_abc123 (ad)
+  - grp_abc123 (ad group)
+  note: >-
+    Prefixes appear only in the spec's filter examples; Channel99 publishes no formal id-prefix
+    reference. Company, visit, pageview, impression and intent ids are opaque strings with no
+    documented prefix.
+  list_fields: audience_id_list is an array of audience ids rather than a join entity.
+
+entities:
+- name: Visit
+  kind: fact
+  operation: getVisits
+  path: /events/visits
+  primary_key: visit_event_id
+  fields:
+  - visit_event_id
+  - event_date
+  - channel_id
+  - vendor_id
+  - tag_id
+  - company_id
+  - audience_id_list
+  - ad_account_id
+  - ad_campaign_group_id
+  - ad_campaign_id
+  - ad_group_id
+  - ad_id
+  - ad_detail_id
+  - current_page
+  - c99_user_cookie_id
+  description: >-
+    One website visit resolved to an identified company. current_page is the landing page of
+    the visit.
+
+- name: Pageview
+  kind: fact
+  operation: getPageviews
+  path: /events/pageviews
+  primary_key: pv_event_id
+  fields:
+  - pv_event_id
+  - visit_event_id
+  - event_date
+  - channel_id
+  - vendor_id
+  - tag_id
+  - company_id
+  - audience_id_list
+  - ad_account_id
+  - ad_campaign_group_id
+  - ad_campaign_id
+  - ad_group_id
+  - ad_id
+  - ad_detail_id
+  - current_page
+  - c99_user_cookie_id
+  description: One page hit recorded by the Channel99 JavaScript tag, nested inside a visit.
+
+- name: Impression
+  kind: fact
+  operation: getImpressions
+  path: /events/impressions
+  primary_key: imp_event_id
+  fields:
+  - imp_event_id
+  - event_date
+  - channel_id
+  - vendor_id
+  - tag_id
+  - company_id
+  - audience_id_list
+  - ad_account_id
+  - ad_campaign_group_id
+  - ad_campaign_id
+  - ad_group_id
+  - ad_id
+  - ad_detail_id
+  - ad_site
+  - ad_unit_id
+  - has_click
+  description: >-
+    One ad exposure captured by the Channel99 impression pixel and resolved to a company.
+    has_click distinguishes click-through from view-through exposure.
+
+- name: Intent
+  kind: fact
+  operation: getIntents
+  path: /events/intents
+  primary_key: intent_event_id
+  fields:
+  - intent_event_id
+  - event_date
+  - channel_id
+  - vendor_id
+  - company_id
+  - audience_id_list
+  - intent_id
+  - intent_type
+  - intent_name
+  - signal_type
+  - count_impressions
+  description: Third-party buyer-intent signal (for example the G2 intent connector) attached to a company.
+
+- name: Company
+  kind: dimension
+  operation: getCompanies
+  path: /dimensions/companies
+  primary_key: company_id
+  fields:
+  - company_id
+  - company_domain
+  - company_name
+  - sector_id
+  - region_id
+  - revenue_range_id
+  description: >-
+    An identified organization. company_domain is the natural key - Channel99 states all data
+    crossing its LLM/MCP surface is shared at the domain level, never at the person level.
+
+- name: Audience
+  kind: dimension
+  operation: getAudiences
+  path: /dimensions/audiences
+  primary_key: audience_id
+  fields:
+  - audience_id
+  - audience_name
+  - audience_description
+  - is_deleted
+  description: A named set of companies (TAM, uploaded list, CRM segment, or rule-based).
+
+- name: Channel
+  kind: dimension
+  operation: getChannels
+  path: /dimensions/channels
+  primary_key: channel_id
+  fields:
+  - channel_id
+  - channel_name
+
+- name: Vendor
+  kind: dimension
+  operation: getVendors
+  path: /dimensions/vendors
+  primary_key: vendor_id
+  fields:
+  - vendor_id
+  - vendor_name
+
+- name: AdAccount
+  kind: dimension
+  operation: getAdAccounts
+  path: /dimensions/ad-accounts
+  primary_key: ad_account_id
+
+- name: AdCampaignGroup
+  kind: dimension
+  operation: getAdCampaignGroups
+  path: /dimensions/ad-campaign-groups
+  primary_key: ad_campaign_group_id
+
+- name: AdCampaign
+  kind: dimension
+  operation: getAdCampaigns
+  path: /dimensions/ad-campaigns
+  primary_key: ad_campaign_id
+  fields:
+  - ad_campaign_id
+  - ad_campaign_name
+  - is_deleted
+
+- name: AdGroup
+  kind: dimension
+  operation: getAdGroups
+  path: /dimensions/ad-groups
+  primary_key: ad_group_id
+
+- name: Ad
+  kind: dimension
+  operation: getAds
+  path: /dimensions/ads
+  primary_key: ad_id
+
+- name: AdUnit
+  kind: dimension
+  operation: getAdUnits
+  path: /dimensions/ad-units
+  primary_key: ad_unit_id
+
+- name: IpCompanyRecord
+  kind: lookup
+  operation: getCompanyByIp
+  path: /ip/{ipAddress}
+  primary_key: ip_address
+  fields:
+  - ip_address
+  - company_domain
+  - company_name
+  - region_name
+  - rev_range_name
+  - sector_name
+  description: >-
+    Reverse IP-to-company resolution. Separately permissioned - not enabled unless explicitly
+    granted.
+
+relationships:
+- from: Pageview
+  to: Visit
+  type: belongs_to
+  via: visit_event_id
+- from: Visit
+  to: Company
+  type: belongs_to
+  via: company_id
+- from: Pageview
+  to: Company
+  type: belongs_to
+  via: company_id
+- from: Impression
+  to: Company
+  type: belongs_to
+  via: company_id
+- from: Intent
+  to: Company
+  type: belongs_to
+  via: company_id
+- from: Visit
+  to: Channel
+  type: belongs_to
+  via: channel_id
+- from: Visit
+  to: Vendor
+  type: belongs_to
+  via: vendor_id
+- from: Impression
+  to: Channel
+  type: belongs_to
+  via: channel_id
+- from: Impression
+  to: Vendor
+  type: belongs_to
+  via: vendor_id
+- from: Impression
+  to: AdUnit
+  type: belongs_to
+  via: ad_unit_id
+- from: Intent
+  to: Channel
+  type: belongs_to
+  via: channel_id
+- from: Intent
+  to: Vendor
+  type: belongs_to
+  via: vendor_id
+- from: Visit
+  to: Audience
+  type: has_many
+  via: audience_id_list
+- from: Pageview
+  to: Audience
+  type: has_many
+  via: audience_id_list
+- from: Impression
+  to: Audience
+  type: has_many
+  via: audience_id_list
+- from: Intent
+  to: Audience
+  type: has_many
+  via: audience_id_list
+- from: Visit
+  to: AdAccount
+  type: belongs_to
+  via: ad_account_id
+- from: Visit
+  to: AdCampaignGroup
+  type: belongs_to
+  via: ad_campaign_group_id
+- from: Visit
+  to: AdCampaign
+  type: belongs_to
+  via: ad_campaign_id
+- from: Visit
+  to: AdGroup
+  type: belongs_to
+  via: ad_group_id
+- from: Visit
+  to: Ad
+  type: belongs_to
+  via: ad_id
+- from: AdCampaign
+  to: AdCampaignGroup
+  type: belongs_to
+  via: ad_campaign_group_id
+  confidence: medium
+  note: Implied by the ad hierarchy naming and the Snowflake share documentation; the flat Pulsar dimension records do not carry the parent key.
+- from: AdGroup
+  to: AdCampaign
+  type: belongs_to
+  via: ad_campaign_id
+  confidence: medium
+- from: Ad
+  to: AdGroup
+  type: belongs_to
+  via: ad_group_id
+  confidence: medium
+- from: Company
+  to: Sector
+  type: belongs_to
+  via: sector_id
+  note: sector, region and revenue_range are referenced by id from Company but have no published dimension endpoint in the Pulsar API.
+- from: Company
+  to: Region
+  type: belongs_to
+  via: region_id
+- from: Company
+  to: RevenueRange
+  type: belongs_to
+  via: revenue_range_id
+
+counts:
+  entities: 15
+  facts: 4
+  dimensions: 10
+  relationships: 27
+  unresolved_dimensions: 3

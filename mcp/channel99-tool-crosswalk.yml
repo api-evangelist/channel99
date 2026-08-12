@@ -1,0 +1,136 @@
+generated: '2026-08-12'
+method: derived
+source: openapi/channel99-pulsar-openapi.json + live probes of mcp.channel99.com and sol.channel99.com
+note: >-
+  Channel99 runs three machine surfaces over the same marketing-performance data set. Only one
+  of them - the Pulsar REST API - publishes a readable contract. This crosswalk records what can
+  honestly be bound and, just as importantly, what cannot: the MCP tool list is OAuth-gated and
+  the GraphQL endpoint is 401 on introspection, so NO tool names are invented here. crosswalk[]
+  is deliberately empty rather than speculatively populated.
+
+surfaces:
+  openapi:
+    file: openapi/channel99-pulsar-openapi.json
+    title: Pulsar API - Channel99 Bulk Data Transfer REST API
+    base_url: https://pulsar.channel99.com
+    reference: https://pulsar.channel99.com/docs/#/
+    gated: false
+    gated_note: >-
+      The Swagger UI and its embedded OpenAPI document are served anonymously at
+      /docs/swagger-ui-init.js (HTTP 200). Calling the API itself requires an M2M client_id +
+      client_secret issued by Channel99.
+    operations: 17
+  mcp:
+    url: https://mcp.channel99.com/mcp
+    transport: streamable-http
+    secondary_transport: wss://mcp.channel99.com/ws
+    gated: true
+    gated_note: >-
+      Anonymous tools/list returns HTTP 401 {"jsonrpc":"2.0","error":{"code":-32000,
+      "message":"Missing Bearer token"}}. OAuth 2.1 via https://api.stytch.app.channel99.com.
+      Tool names and inputSchemas require an authenticated introspection.
+    tools_enumerated: false
+  graphql:
+    endpoint: https://sol.channel99.com/@/graphql
+    gated: true
+    gated_note: >-
+      Advertised by the public root discovery document at https://sol.channel99.com/ as "GraphQL
+      Studio". POST of the minimal introspection query {__schema{queryType{name}}} returns HTTP
+      401 err:sol.core.missing-authentication. SDL not captured; not fabricated.
+    sdl_captured: false
+  data_share:
+    type: Snowflake Secure Data Sharing
+    docs: https://support.channel99.com/hc/en-us/articles/35162878162331-Channel99-Data-Share-Snowflake
+    note: >-
+      Channel99's own MCP documentation states the MCP services are built over the same schema
+      as the Snowflake share (fact tables Visit, Pageview, Impression plus ad, audience, company,
+      vendor and channel dimensions) - the same entity set the Pulsar REST operations return.
+
+crosswalk: []
+
+mcp_only: []
+
+rest_only:
+- operationId: postAuthToken
+  method: POST
+  path: /auth/token
+  category: auth
+- operationId: getHealth
+  method: GET
+  path: /health
+  category: ops
+- operationId: getVisits
+  method: GET
+  path: /events/visits
+  category: events
+- operationId: getPageviews
+  method: GET
+  path: /events/pageviews
+  category: events
+- operationId: getImpressions
+  method: GET
+  path: /events/impressions
+  category: events
+- operationId: getIntents
+  method: GET
+  path: /events/intents
+  category: events
+- operationId: getAdAccounts
+  method: GET
+  path: /dimensions/ad-accounts
+  category: dimensions
+- operationId: getAdCampaignGroups
+  method: GET
+  path: /dimensions/ad-campaign-groups
+  category: dimensions
+- operationId: getAdCampaigns
+  method: GET
+  path: /dimensions/ad-campaigns
+  category: dimensions
+- operationId: getAdGroups
+  method: GET
+  path: /dimensions/ad-groups
+  category: dimensions
+- operationId: getAdUnits
+  method: GET
+  path: /dimensions/ad-units
+  category: dimensions
+- operationId: getAds
+  method: GET
+  path: /dimensions/ads
+  category: dimensions
+- operationId: getAudiences
+  method: GET
+  path: /dimensions/audiences
+  category: dimensions
+- operationId: getChannels
+  method: GET
+  path: /dimensions/channels
+  category: dimensions
+- operationId: getCompanies
+  method: GET
+  path: /dimensions/companies
+  category: dimensions
+- operationId: getVendors
+  method: GET
+  path: /dimensions/vendors
+  category: dimensions
+- operationId: getCompanyByIp
+  method: GET
+  path: /ip/{ipAddress}
+  category: identity
+  note: >-
+    Separately permissioned. The developer guide states "Access to separately permissioned
+    services, including the Channel99 IP API, is not enabled unless explicitly granted."
+
+coverage:
+  rest_operations: 17
+  mcp_tools: null
+  bound: 0
+  mcp_only: 0
+  rest_only: 17
+  bindable: false
+  bindable_reason: >-
+    A crosswalk needs one enumerable tool list. Channel99's is behind OAuth and no tool manifest
+    is published anywhere public, so 0 of 17 REST operations can be bound to a named tool today.
+    Re-run this artifact after an authenticated tools/list and the bindings will be real.

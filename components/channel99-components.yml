@@ -1,0 +1,113 @@
+generated: '2026-08-12'
+method: searched
+source: https://support.channel99.com/hc/en-us/articles/13540651385883-Deploy-Channel99-Tag-On-Your-Site
+docs:
+- https://support.channel99.com/hc/en-us/articles/13540651385883-Deploy-Channel99-Tag-On-Your-Site
+- https://support.channel99.com/hc/en-us/articles/17470526473115-Channel99-Tag-Installation-Non-GTM-Google-Tag-Manager
+- https://support.channel99.com/hc/en-us/articles/24740418947739-What-s-the-Channel99-Pixel
+- https://support.channel99.com/hc/en-us/articles/20169343167899-Is-the-Channel99-Tag-on-page
+
+note: >-
+  Channel99's client-side surface is not a UI component library - it is a collection-side one.
+  Two embeddable artifacts do the data capture the whole platform depends on: an asynchronous
+  JavaScript tag on the customer's own website, and a 1x1 image beacon placed inside partner ad
+  creative, PR releases and syndicated content. Both are distributed as copy-paste snippets
+  generated per tenant inside the Channel99 app, not as registry packages, so there is no version
+  to pin and no integrity hash to verify - see packages/channel99-packages.yml.
+
+families:
+
+- family: Website tag
+  name: Channel99 Tag (tagserver)
+  kind: script-snippet
+  purpose: >-
+    Captures visit and pageview data plus IP and user agent for account-level identification.
+    Page URL including UTM parameters is used to associate channel and vendor visits with spend
+    and pipeline data. Without the tag the platform does not function.
+  loader_host: https://api.c99.ai
+  loader_path: /api/v1/fire/snippet
+  loader_shape: '<script async id="tagserver" src="https://api.c99.ai/api/v1/fire/snippet?domain={domain}&token={token}"></script>'
+  loader_shape_source: >-
+    Read from the published app.channel99.com JavaScript bundle, which renders exactly this
+    snippet on the tag-installation screen.
+  parameters:
+  - name: domain
+    description: The customer's website domain.
+  - name: token
+    description: Per-instance tag token issued by Channel99; found at the bottom of the Company Settings page.
+  loading: asynchronous, non-blocking
+  install_methods:
+  - method: Google Tag Manager
+    detail: Custom HTML tag fired on the All Pages trigger.
+  - method: Direct script
+    detail: >-
+      A <script> block in the site <head> that creates an element with id "tagserver", appends
+      document.referrer (URI-encoded) to the tag URL, and appends it to document.documentElement.
+  versioning: unpinned
+  versioning_note: >-
+    The snippet points at a floating endpoint with no version segment and no subresource
+    integrity attribute. A consumer cannot tell which build of the tag they are executing, and
+    Channel99 can change it under them without a release note.
+  data_latency: Data appears in the platform within roughly 1-4 hours of first fire.
+  cookies: >-
+    The tag sets a first-party user cookie id (surfaced in the API as c99_user_cookie_id). The
+    separate impression pixel does not use cookies.
+
+- family: Impression pixel
+  name: Channel99 Pixel (C99 Pixel)
+  kind: image-beacon
+  purpose: >-
+    Captures ad impression view data from vendors and content partners so exposure can be tied
+    to later company visits (view-through attribution and direct-traffic reallocation).
+  loader_host: https://ping.channel99.io
+  loader_shape: 'https://ping.channel99.io/?C99={pixel_token}'
+  loader_shape_source: https://support.channel99.com/hc/en-us/articles/24740418947739-What-s-the-Channel99-Pixel
+  format: 1x1 hosted image / web beacon
+  cookies: false
+  cookies_note: Channel99 states the pixel deliberately uses no cookies and does not track at user level.
+  blocking: false
+  blocking_note: Not an ad-blocking pixel; measurement only.
+  provisioning: >-
+    Created in-app on the Pixel screen (name, channel, vendor, default audience), then Published;
+    the generated code is copied out and handed to the vendor or agency.
+  variants:
+  - name: Pixel for advertising vendors
+    partners_documented:
+    - Google Ads
+    - Microsoft Display Ads
+    - LinkedIn Ads
+    - Facebook Ads
+    - Reddit Ads
+    - TikTok Ads
+    - X (Twitter) Ads
+    - StackAdapt
+    - Google Ad Manager (GAM)
+    - RollWorks / AdRoll
+    - 6sense
+    - Demandbase
+    - G2
+  - name: Pixel for PR
+    detail: 1x1 beacon embedded in a press release to identify companies viewing the release.
+  - name: Pixel for content syndication
+    detail: Beacon embedded in syndicated content assets.
+
+- family: Embedded assistants
+  name: Channel99 AI assistant surfaces
+  kind: hosted-in-product
+  purpose: In-product AI chat and generated chart apps rendered inside the Channel99 web app.
+  detail: >-
+    The app bundle mounts sandboxed MCP "apps" (for example an SQL-results chart app) inside an
+    iframe via /mcp-sandbox.html, driven over wss://mcp.channel99.com/ws. These are internal to
+    app.channel99.com and are not offered as an embeddable component for customer sites.
+  embeddable_by_customers: false
+  related: mcp/channel99-mcp.yml
+
+verification_tooling:
+- name: Tag presence check
+  docs: https://support.channel99.com/hc/en-us/articles/20169343167899-Is-the-Channel99-Tag-on-page
+  detail: Documented procedure for confirming the tag is firing on a page.
+
+counts:
+  families: 3
+  customer_embeddable: 2
+  registry_distributed: 0

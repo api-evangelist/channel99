@@ -1,0 +1,76 @@
+generated: '2026-08-12'
+method: searched
+source: https://pulsar.channel99.com/docs/#/
+docs:
+- https://pulsar.channel99.com/docs/#/
+- https://support.channel99.com/hc/en-us/articles/49766041989787-Channel99-Reporting-API-Developer-Guide
+derived_from: openapi/channel99-pulsar-openapi.json
+
+note: >-
+  Channel99 publishes its numeric limits inside the OpenAPI document itself - the
+  components.responses.TooManyRequests description enumerates four distinct tiers and names the
+  environment variable that disables the application-level tier. That is unusually specific for
+  a B2B martech API. The prose developer guide is weaker, deferring to "the Swagger documentation
+  or your Channel99 contract", so the spec is the authoritative source recorded here.
+
+limits:
+- scope: per-client_id
+  applies_to: POST /auth/token
+  limit: 20
+  window: 1 minute
+  enforced_at: application
+  note: A separate WAF per-IP limit also applies to token issuance.
+- scope: per-client
+  applies_to: /events/* and /dimensions/*
+  limit: 100
+  window: 10 seconds
+  burst: true
+  enforced_at: application
+  note: Described in the spec as a burst limit.
+- scope: per-x-client-id
+  applies_to: all authenticated routes
+  limit: 60
+  window: 1 second
+  measured_over: 5 minutes
+  enforced_at: waf
+- scope: per-client
+  applies_to: /ip/* (Channel99 IP API)
+  limit: null
+  window: null
+  enforced_at: waf
+  tier: elevated
+  note: >-
+    The spec states /ip/* routes get a WAF elevated tier and that the application burst limit
+    does not apply. The numeric ceiling of the elevated tier is not published.
+
+response:
+  status_on_exhaustion: 429
+  headers:
+  - name: Retry-After
+    description: Number of seconds to wait before retrying.
+    type: integer
+    example: 60
+  body: '{"error":"...","code":"...","message":"Rate limit exceeded"}'
+  standard_ratelimit_headers: false
+  standard_ratelimit_headers_note: >-
+    Channel99 does not return RateLimit-Limit / RateLimit-Remaining / RateLimit-Reset or the
+    X-RateLimit-* family. Retry-After on a 429 is the only runtime signal, so a client cannot
+    see how much budget remains before it is cut off - it can only react after the fact.
+
+configuration:
+- key: PULSAR_APP_RATE_LIMITS
+  values: '0 | false | off'
+  effect: Disables the application-level limits. WAF limits still apply.
+  note: Published in the spec; presumably a deployment-side toggle rather than a customer control.
+
+guidance:
+  published: true
+  source: https://support.channel99.com/hc/en-us/articles/49766041989787-Channel99-Reporting-API-Developer-Guide
+  recommendations:
+  - Use exponential backoff for 429 responses.
+  - Avoid parallel requests over very large date ranges.
+  - Cache lookup data such as channel, vendor, campaign and audience IDs.
+  - Schedule large exports during off-peak hours where possible.
+  - Retry failed pages rather than restarting the full export.
+
+limit_count: 4

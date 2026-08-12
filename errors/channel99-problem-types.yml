@@ -1,0 +1,155 @@
+generated: '2026-08-12'
+method: searched
+source: https://support.channel99.com/hc/en-us/articles/49766041989787-Channel99-Reporting-API-Developer-Guide
+derived_from: openapi/channel99-pulsar-openapi.json
+probes:
+- url: https://pulsar.channel99.com/openapi.json
+  status: 401
+- url: https://pulsar.channel99.com/docs/json
+  status: 404
+- url: https://sol.channel99.com/@/graphql
+  status: 401
+
+format: custom-json
+rfc9457: false
+media_type: application/json
+note: >-
+  Channel99 does not use RFC 9457 problem+json. Every Pulsar error is a flat JSON object with
+  three required fields, and it carries a genuinely machine-readable, namespaced code - which is
+  more useful to an agent than most problem+json bodies. The codes below were confirmed by
+  fetching the endpoints anonymously, not inferred: each one was returned live. The sibling Sōl
+  and MCP surfaces use their own namespaces (err:sol.*, err:mcp.*) with a different envelope
+  shape, so an agent cannot assume one error contract across Channel99 hosts.
+
+envelope:
+  pulsar:
+    fields:
+    - name: error
+      required: true
+      description: Error class name, e.g. MissingHeaderError, NotFoundError.
+    - name: code
+      required: true
+      description: Machine-readable namespaced code, err:pulsar.<domain>.<condition>.
+    - name: message
+      required: true
+      description: Human-readable description.
+    example: '{"error":"NotFoundError","code":"err:pulsar.core.not-found","message":"The requested resource was not found"}'
+  sol:
+    fields:
+    - message
+    - extensions.code
+    - extensions.details
+    example: '{"message":"Not authorized. Authorization header missing, expired, or otherwise invalid.","extensions":{"code":"err:sol.core.missing-authentication","details":{}}}'
+  mcp:
+    shape: JSON-RPC 2.0 error object
+    example: '{"jsonrpc":"2.0","error":{"code":-32000,"message":"Missing Bearer token","rpcId":1}}'
+
+status_codes:
+- status: 200
+  meaning: Request succeeded.
+  action: Process the response.
+- status: 400
+  meaning: Bad request.
+  action: Check required parameters, parameter formats and date ranges.
+- status: 401
+  meaning: Unauthorized.
+  action: Confirm the access token is valid and included, and that x-client-id is present.
+- status: 403
+  meaning: Forbidden.
+  action: Confirm the token and x-client-id represent the same client and that the client has access to the resource.
+- status: 404
+  meaning: Not found.
+  action: Confirm the endpoint path and object IDs.
+- status: 429
+  meaning: Rate limited.
+  action: Retry using exponential backoff; honour the Retry-After header.
+- status: 500
+  meaning: Server error.
+  action: Retry later or contact Channel99 Support.
+
+problem_types:
+- code: err:pulsar.core.missing-header
+  error: MissingHeaderError
+  status: 401
+  title: Missing required header
+  detail: 'Missing required header: x-client-id'
+  remediation: Send x-client-id on every request, including on /openapi.json and the docs assets.
+  evidence: Observed live on GET https://pulsar.channel99.com/ (HTTP 401).
+- code: err:pulsar.auth.missing-credentials
+  status: 400
+  title: Missing credentials
+  detail: Missing client_id or client_secret on POST /auth/token.
+  remediation: Post both client_id and client_secret as JSON.
+  evidence: openapi components.responses.BadRequest
+- code: err:pulsar.auth.invalid-credentials
+  status: 401
+  title: Invalid credentials
+  detail: Invalid client_id or client_secret.
+  remediation: Re-check the M2M credentials issued by Channel99 for this instance.
+  evidence: openapi components.responses.Unauthorized
+- code: err:pulsar.core.not-found
+  error: NotFoundError
+  status: 404
+  title: Not found
+  detail: No matching route or resource.
+  remediation: Confirm the path and any object ids.
+  evidence: Observed live on GET https://pulsar.channel99.com/docs/json (HTTP 404).
+- code: err:pulsar.request.invalid-limit
+  status: 400
+  title: Invalid limit
+  detail: The limit query parameter exceeded the maximum of 1000 (or was below 1).
+  remediation: Use a limit between 1 and 1000; omit it for the default of 200.
+  evidence: openapi components.parameters.listLimit
+- code: null
+  error: null
+  status: 400
+  title: Invalid cursor, filter or sort
+  detail: >-
+    Bad request - missing instance, invalid cursor, invalid filter, invalid sort, or invalid
+    limit. The spec documents the condition on every list operation but names a discrete code
+    only for the limit case.
+  remediation: Replay the exact nextCursor from the previous page; check the filter[field][op] syntax.
+  evidence: openapi 400 response description on all /events/* and /dimensions/* operations
+- code: null
+  status: 403
+  title: Forbidden
+  detail: Invalid token or client mismatch - the bearer token's client_id claim does not match x-client-id.
+  remediation: Mint the token with the same client_id that you send in the header.
+  evidence: openapi 403 response description
+- code: null
+  status: 429
+  title: Too many requests
+  detail: Rate limit exceeded - too many requests from this client.
+  remediation: Back off exponentially using the Retry-After header (seconds).
+  headers:
+  - Retry-After
+  evidence: openapi components.responses.TooManyRequests
+- code: null
+  status: 500
+  title: Internal server error
+  remediation: Retry later; contact Channel99 Support with the endpoint, parameters, date range and approximate request time.
+  evidence: openapi 500 response description
+
+adjacent_surfaces:
+- code: err:sol.core.missing-authentication
+  status: 401
+  surface: sol.channel99.com
+  detail: Authorization header missing, expired, or otherwise invalid.
+  evidence: Observed live on GET https://sol.channel99.com/@/swagger (HTTP 401).
+- code: err:mcp.auth-failure
+  surface: mcp.channel99.com
+  evidence: app.channel99.com JavaScript bundle error enum
+- code: err:mcp.unknown-route
+  surface: mcp.channel99.com
+  evidence: app.channel99.com JavaScript bundle error enum
+- code: err:mcp.internal-server-error
+  surface: mcp.channel99.com
+  evidence: app.channel99.com JavaScript bundle error enum
+- code: rate_limit_exceeded
+  surface: mcp.channel99.com
+  evidence: app.channel99.com JavaScript bundle error enum
+
+counts:
+  problem_types: 9
+  coded: 5
+  adjacent: 5

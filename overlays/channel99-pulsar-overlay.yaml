@@ -1,0 +1,154 @@
+overlay: 1.0.0
+info:
+  title: API Evangelist enhancements for the Channel99 Pulsar API
+  version: 1.0.0
+extends: openapi/channel99-pulsar-openapi.json
+
+x-provenance:
+  generated: '2026-08-12'
+  method: generated
+  source: >-
+    Enhancements derived from the Channel99 Reporting API Developer Guide
+    (https://support.channel99.com/hc/en-us/articles/49766041989787-Channel99-Reporting-API-Developer-Guide)
+    and from live probes of pulsar.channel99.com. The original document at
+    openapi/channel99-pulsar-openapi.json is never mutated.
+  note: >-
+    The single highest-value correction here is servers[]. The document as published declares
+    `servers: [{url: "/"}]` - a relative server that names no host, so an agent handed only the
+    spec cannot reach the API at all. Channel99's own developer guide states plainly: "All
+    Reporting API endpoints use https://pulsar.channel99.com unless otherwise specified in the
+    API reference." That sentence is the authority for the server URL set below.
+
+actions:
+
+- target: $.servers
+  description: >-
+    Replace the relative server with the real production host, as named by Channel99's own
+    developer guide.
+  update:
+  - url: https://pulsar.channel99.com
+    description: Production - Channel99 Pulsar (Bulk Data Transfer / Reporting) API
+
+- target: $.info
+  description: Add contact, licence-free terms pointers and external documentation identity.
+  update:
+    contact:
+      name: Channel99 Support
+      email: support@channel99.com
+      url: https://support.channel99.com/hc/en-us
+    termsOfService: https://www.channel99.com/terms-of-service
+    x-apis-io-provider: channel99
+    x-api-evangelist-note: >-
+      Contact and terms are added from Channel99's published support and legal pages; the
+      original document declares neither.
+
+- target: $.externalDocs
+  description: Point at the human developer guide that documents the auth exchange and reporting concepts.
+  update:
+    description: Channel99 Reporting API Developer Guide
+    url: https://support.channel99.com/hc/en-us/articles/49766041989787-Channel99-Reporting-API-Developer-Guide
+
+- target: $.info.x-rate-limits
+  description: >-
+    Surface the rate-limit tiers as structured data. They are published in the document today,
+    but only as prose inside components.responses.TooManyRequests.description, where no tool can
+    read them.
+  update:
+    documented: true
+    retry_after_header: Retry-After
+    status_on_exhaustion: 429
+    budget_headers: false
+    tiers:
+    - scope: client_id
+      applies_to: POST /auth/token
+      limit: 20
+      window: 60
+      unit: requests-per-minute
+    - scope: client
+      applies_to: /events/* and /dimensions/*
+      limit: 100
+      window: 10
+      unit: requests-per-10-seconds
+      burst: true
+    - scope: x-client-id
+      applies_to: all authenticated routes
+      limit: 60
+      window: 1
+      unit: requests-per-second
+      enforced_at: waf
+    - scope: client
+      applies_to: /ip/*
+      limit: null
+      enforced_at: waf
+      tier: elevated
+    source: components.responses.TooManyRequests.description of the published document
+
+- target: $.info.x-pagination
+  description: Declare the cursor pagination contract at document level so a client can discover it without reading every parameter.
+  update:
+    style: cursor
+    cursor_param: cursor
+    limit_param: limit
+    default_limit: 200
+    max_limit: 1000
+    next_field: nextCursor
+    terminator: nextCursor is null
+    applies_to:
+    - /events/visits
+    - /events/pageviews
+    - /events/impressions
+    - /events/intents
+
+- target: $.info.x-error-format
+  description: Declare the error envelope, which the document models as a schema but never names.
+  update:
+    format: custom-json
+    media_type: application/json
+    rfc9457: false
+    fields:
+    - error
+    - code
+    - message
+    code_namespace: err:pulsar.<domain>.<condition>
+    catalog: errors/channel99-problem-types.yml
+
+- target: $.info.x-idempotency
+  description: State the absence explicitly so an agent does not have to infer it.
+  update:
+    supported: false
+    header: null
+    note: >-
+      No idempotency key is defined. 16 of 17 operations are GETs and are safe to retry;
+      POST /auth/token is not idempotent - each call mints a new token.
+
+- target: $.paths['/ip/{ipAddress}'].get
+  description: Flag the separately-permissioned entitlement documented in the developer guide but absent from the spec.
+  update:
+    x-entitlement:
+      separately_permissioned: true
+      note: >-
+        "Access to separately permissioned services, including the Channel99 IP API, is not
+        enabled unless explicitly granted." A token valid for /events/* and /dimensions/* may
+        still return 403 here.
+      source: https://support.channel99.com/hc/en-us/articles/49766041989787-Channel99-Reporting-API-Developer-Guide
+
+- target: $.paths['/auth/token'].post
+  description: Record the token lifetime and the absence of a refresh token as structured data.
+  update:
+    x-token:
+      lifetime_seconds: 3600
+      refresh_token: false
+      reissue: Re-POST the same credentials after expiry.
+      pairing: >-
+        Every subsequent request must carry BOTH Authorization: Bearer <token> and
+        x-client-id: <client_id>; a mismatch returns 403.
+
+- target: $.tags
+  description: Add a machine-readable grouping of the tag set into fact, dimension, identity and platform families.
+  update:
+  - name: x-families
+    description: >-
+      events (Visits, Pageviews, Impressions, Intents) are fact entities; dimensions
+      (Ad Accounts, Ad Campaign Groups, Ad Campaigns, Ad Groups, Ad Units, Ads, Audiences,
+      Channels, Companies, Vendors) are lookup entities joined by *_id; IP Lookup is identity
+      resolution; Auth and Health are platform operations. See data-model/channel99-data-model.yml.

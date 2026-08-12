@@ -1,0 +1,100 @@
+generated: '2026-08-12'
+method: searched
+source: https://support.channel99.com/hc/en-us
+docs: https://support.channel99.com/hc/en-us
+
+scheme:
+  style: monthly-product-release-notes
+  location: Channel99 help centre (Zendesk), one article per release month
+  machine_readable: partial
+  machine_readable_note: >-
+    There is no changelog page, RSS feed or /changelog route on channel99.com. The release notes
+    are individual help-centre articles, which the Zendesk Help Center API does expose as JSON at
+    https://support.channel99.com/api/v2/help_center/en-us/articles.json - readable by a machine,
+    but only because the docs platform provides it, not because Channel99 publishes a feed.
+  api_specific: false
+  api_specific_note: >-
+    The notes are product release notes, not API release notes. Nothing in them versions the
+    Pulsar API, records a breaking change to it, or announces a contract change - the Reporting
+    API's own arrival is not even announced in a release entry. An integrator has no changelog
+    that speaks to the contract they build against.
+  earliest_entry: '2022-12'
+
+current_version: 1.0.0
+current_version_source: info.version in openapi/channel99-pulsar-openapi.json
+
+entries:
+- version: '2026-01'
+  date: '2026-01'
+  published: '2026-03-30'
+  url: https://support.channel99.com/hc/en-us/articles/48487117045019-January-2026-Product-Release
+  breaking: false
+  additions:
+  - C99 MCP Server - exposes the knowledge repository plus a guarded SQL-backed data interface so an LLM can formulate runnable queries against customer tables, under read-only controls.
+  - ChatGPT Connector (Beta) - links the C99 MCP Server to ChatGPT; requires an MCP Server, pilot customers only.
+  - G2 Intent Connector - G2 intent signals available inside MCP; maps intent to accounts and can trigger audiences.
+  - Paid Search Module - keyword and ad-group level visibility, with AI keyword analysis via the MCP Server.
+  - Slack AI Assistant - native Slack assistant answering plain-English questions over account activity.
+  highlights: The release that turned Channel99's AI layer into an addressable API surface.
+
+- version: '2025-12'
+  date: '2025-12'
+  published: '2026-03-30'
+  url: https://support.channel99.com/hc/en-us/articles/48486829171483-December-2025-Product-Release
+  breaking: false
+  additions:
+  - In-app interactive user guides and contextual help.
+  - Facebook/Meta audience activation with Custom Audiences, lookalikes and Conversion API events.
+  - Microsoft Advertising audience activation with customer-match uploads and scheduled syncing.
+
+- version: '2025-10'
+  date: '2025-10'
+  published: '2025-12-11'
+  url: https://support.channel99.com/hc/en-us/articles/44302125640603-October-2025-Product-Release
+  breaking: false
+  additions:
+  - Dynamic rule-based audiences refreshing on a 24-hour cadence.
+  - HubSpot CRM integration for CRM-backed audiences.
+  - Lead tracking with per-vendor influence.
+  - Vendor "companies reached" metric.
+  - AI Digest - automated bi-weekly/monthly performance summary emails.
+  - LinkedIn and Google audience activation.
+
+- version: '2025-08'
+  date: '2025-08'
+  published: '2025-11-20'
+  url: https://support.channel99.com/hc/en-us/articles/43536601389339-August-2025-Product-Release
+  breaking: false
+  additions:
+  - Direct view-through reallocation, new vendor page metrics and reallocation chart.
+  - Snowflake Data Share - three new tables (Visits, Pageviews, Impressions).
+  - Instance switcher for agencies, internal super users and multi-website customers.
+  highlights: >-
+    The Snowflake share tables added here are the same Visit/Pageview/Impression facts the
+    Pulsar API later exposed over REST.
+
+- version: '2025-06'
+  date: '2025-06'
+  published: '2025-06-18'
+  url: https://support.channel99.com/hc/en-us/articles/38124647855515-June-2025-Product-Release
+  breaking: false
+  additions:
+  - Advanced filtering on the Company Activity page by URL, channel, vendor, campaign, industry, revenue range and region.
+
+- version: '2025-05'
+  date: '2025-05'
+  published: '2025-06-17'
+  url: https://support.channel99.com/hc/en-us/articles/38092344937627-May-2025-Product-Release
+  breaking: false
+
+- version: '2025-03'
+  date: '2025-03'
+  published: '2025-05-02'
+  url: https://support.channel99.com/hc/en-us/articles/36558890274331-March-2025-Product-Release
+  breaking: false
+
+counts:
+  entries_recorded: 7
+  release_articles_total: 24
+  window: 2025-03 through 2026-01 (recent window; the help centre carries monthly notes back to December 2022)
+  breaking_changes_recorded: 0

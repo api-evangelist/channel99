@@ -1,0 +1,164 @@
+generated: '2026-08-12'
+method: derived
+source: openapi/channel99-pulsar-openapi.json + well-known/ probes + Channel99 help centre
+docs:
+- https://support.channel99.com/hc/en-us/articles/47105598392475-MCP-Server-General-FAQ
+- https://support.channel99.com/hc/en-us/articles/49766041989787-Channel99-Reporting-API-Developer-Guide
+- https://www.channel99.com/company/privacy
+
+note: >-
+  Assertions below are evidence-backed one way or the other. Where Channel99 claims something in
+  prose but publishes nothing machine-checkable, that is recorded as conforms: false with the
+  claim quoted, not as a pass.
+
+standards:
+- id: openapi
+  name: OpenAPI Specification
+  version: 3.0.3
+  conforms: true
+  evidence: >-
+    A complete OpenAPI 3.0.3 document (17 operations, 30 component schemas, typed security
+    schemes) is served anonymously at https://pulsar.channel99.com/docs/swagger-ui-init.js and
+    rendered at https://pulsar.channel99.com/docs/#/. Captured verbatim at
+    openapi/channel99-pulsar-openapi.json.
+
+- id: oauth2
+  name: OAuth 2.0 / 2.1
+  conforms: true
+  evidence: >-
+    The MCP server publishes RFC 8414 authorization-server metadata naming an authorization_code
+    + refresh_token grant with mandatory PKCE (S256). Channel99's own FAQ answers the auth
+    standard question with "OAuth 2.1".
+
+- id: oauth-authorization-server-metadata
+  name: RFC 8414 OAuth 2.0 Authorization Server Metadata
+  conforms: true
+  evidence: https://mcp.channel99.com/.well-known/oauth-authorization-server returns HTTP 200 JSON.
+
+- id: oauth-protected-resource-metadata
+  name: RFC 9728 OAuth 2.0 Protected Resource Metadata
+  conforms: true
+  evidence: https://mcp.channel99.com/.well-known/oauth-protected-resource returns HTTP 200 JSON naming the resource and its authorization server.
+
+- id: oidc
+  name: OpenID Connect Discovery 1.0
+  conforms: true
+  evidence: >-
+    https://api.stytch.app.channel99.com/.well-known/openid-configuration returns HTTP 200 with
+    issuer, jwks_uri, userinfo_endpoint and RS256 id-token signing.
+
+- id: pkce
+  name: RFC 7636 PKCE
+  conforms: true
+  evidence: code_challenge_methods_supported ["S256"] in the published authorization-server metadata.
+
+- id: mcp
+  name: Model Context Protocol
+  conforms: true
+  evidence: >-
+    POST https://mcp.channel99.com/mcp answers with a JSON-RPC 2.0 error envelope
+    (code -32000, "Missing Bearer token") rather than an HTML shell, and the protected-resource
+    metadata follows the MCP authorization spec's discovery pattern. Tool schemas are gated.
+
+- id: jwt
+  name: RFC 7519 JSON Web Token
+  conforms: true
+  evidence: bearerFormat JWT on the Pulsar bearerAuth scheme; Stytch-issued, RS256, JWKS published.
+
+- id: pagination
+  name: Cursor pagination
+  conforms: true
+  evidence: cursor / limit query parameters and a nextCursor response field on every /events/* list operation.
+
+- id: rate-limit-signalling
+  name: Rate-limit response signalling
+  conforms: partial
+  evidence: >-
+    HTTP 429 with a Retry-After header is documented on every operation, and four numeric limit
+    tiers are published in the spec. No RateLimit-* or X-RateLimit-* budget headers are returned,
+    so a client cannot see remaining budget before exhaustion.
+
+- id: rfc9457
+  name: RFC 9457 Problem Details for HTTP APIs
+  conforms: false
+  evidence: >-
+    Errors are a custom flat {error, code, message} object served as application/json, not
+    application/problem+json. The code field is namespaced and machine-readable
+    (err:pulsar.core.not-found), which recovers much of the value, but the media type and the
+    RFC's field names are not used.
+
+- id: rfc8594
+  name: RFC 8594 Sunset header / deprecation signalling
+  conforms: false
+  evidence: No Sunset or Deprecation header is documented, and no operation in the spec is marked deprecated.
+
+- id: idempotency
+  name: Idempotency keys (draft-ietf-httpapi-idempotency-key-header)
+  conforms: false
+  evidence: No idempotency key header is documented on any operation.
+
+- id: json-schema
+  name: JSON Schema
+  conforms: partial
+  evidence: >-
+    Component schemas are OpenAPI 3.0.3 Schema Objects (JSON Schema draft-04 flavoured, using
+    the nullable keyword rather than type unions). No standalone JSON Schema documents are published.
+
+- id: graphql
+  name: GraphQL
+  conforms: unknown
+  evidence: >-
+    https://sol.channel99.com/ advertises a "GraphQL Studio" link, but the endpoint returns
+    HTTP 401 err:sol.core.missing-authentication to anonymous introspection. Presence is
+    confirmed; conformance cannot be assessed.
+
+- id: asyncapi
+  name: AsyncAPI
+  conforms: false
+  evidence: >-
+    No event, webhook or streaming surface is published. Channel99 delivers bulk data by pull
+    (Pulsar REST) and by Snowflake Secure Data Sharing, not by push. Not applicable rather than
+    deficient.
+
+- id: a2a
+  name: A2A Agent Card
+  conforms: false
+  evidence: >-
+    No /.well-known/agent-card.json or /.well-known/agent.json on any Channel99 host. The 200s
+    on app.channel99.com are an SPA catch-all returning HTML, not an agent card.
+
+compliance_claims:
+- claim: Read-only access from the MCP/LLM connection to Channel99 databases.
+  source: https://support.channel99.com/hc/en-us/articles/47105598392475-MCP-Server-General-FAQ
+  verified: false
+  note: Provider assertion; not independently verifiable from public artifacts.
+- claim: No contact information, user names, passwords or emails are shared with any LLM; all data is shared at the domain level.
+  source: https://support.channel99.com/hc/en-us/articles/47105598392475-MCP-Server-General-FAQ
+  verified: false
+- claim: Data encrypted in transit and at rest.
+  source: https://support.channel99.com/hc/en-us/articles/47105598392475-MCP-Server-General-FAQ
+  verified: partial
+  note: TLS 1.3 with HSTS (max-age 31536000) confirmed on channel99.com by probe; at-rest encryption is a provider assertion.
+- claim: Customer data is segregated database-per-customer, with monitoring and change logs used to audit activity.
+  source: https://support.channel99.com/hc/en-us/articles/47105598392475-MCP-Server-General-FAQ
+  verified: false
+- claim: Cookieless, privacy-forward identification - Channel99 identifies companies, not people.
+  source: https://www.channel99.com/company/privacy
+  verified: false
+
+certifications:
+  published: false
+  note: >-
+    No named certification (SOC 2, ISO 27001, PCI DSS, HIPAA, FedRAMP) is published on any public
+    Channel99 page, and there is no trust centre. The MCP FAQ answers the direct question "What
+    compliance attestations and security testing do you have?" without naming an attestation -
+    it answers about export methods instead - and elsewhere says the internal access policy and
+    audit summary would be published "on request". No Compliance pointer is emitted, because
+    there is no published certification to point at.
+
+counts:
+  asserted: 17
+  conforms_true: 9
+  conforms_partial: 3
+  conforms_false: 4
+  unknown: 1

@@ -1,0 +1,80 @@
+generated: '2026-08-12'
+method: searched
+source: >-
+  Registry searches against npm, PyPI, RubyGems, crates.io, NuGet, Maven Central, pkg.go.dev and
+  Packagist, plus the Channel99 help centre, the Reporting API developer guide and the
+  app.channel99.com bundle.
+
+note: >-
+  Channel99 publishes no first-party client library on any package registry, and none is
+  referenced from its documentation. The Reporting API developer guide teaches integration with
+  raw curl only. This is an honest zero, recorded so a later run can tell "checked, nothing
+  there" from "not checked".
+
+packages: []
+package_count: 0
+official_sdk_count: 0
+
+registries_checked:
+- registry: npm
+  query: channel99
+  endpoint: https://registry.npmjs.org/-/v1/search?text=channel99
+  result: no matching package
+- registry: pypi
+  query: channel99
+  endpoint: https://pypi.org/pypi/channel99/json
+  status: 404
+  result: absent
+- registry: rubygems
+  query: channel99
+  result: no matching package
+- registry: crates.io
+  query: channel99
+  result: no matching package
+- registry: nuget
+  query: channel99
+  result: no matching package
+- registry: maven-central
+  query: channel99
+  result: no matching package
+- registry: pkg.go.dev
+  query: channel99
+  result: no matching package
+- registry: packagist
+  query: channel99
+  result: no matching package
+
+source_code:
+  github_org: null
+  github_org_note: >-
+    https://api.github.com/orgs/channel99 returns 404. A personal account github.com/channel99
+    exists with one public repository and no company attribution; it is not treated as a
+    Channel99 source.
+
+distribution_without_a_registry:
+- name: Channel99 Tag (tagserver)
+  registry: cdn
+  url: https://api.c99.ai/api/v1/fire/snippet
+  version: null
+  published: null
+  note: >-
+    Distributed as a per-tenant copy-paste script tag from a floating, unversioned endpoint with
+    no subresource-integrity attribute. There is no registry metadata endpoint to query and no
+    version pinned in the URL, so a consumer cannot determine which build they are running.
+    Detail in components/channel99-components.yml.
+- name: Channel99 Pixel (C99 Pixel)
+  registry: cdn
+  url: https://ping.channel99.io/
+  version: null
+  published: null
+  note: >-
+    1x1 image beacon served from an unversioned endpoint. No registry, no version, no dated
+    release; the same "checked, nothing to record" gap as the tag.
+
+out_of_band_delivery:
+- name: Channel99 Data Share
+  mechanism: Snowflake Secure Data Sharing (listing or direct share, AWS us-east-1)
+  docs: https://support.channel99.com/hc/en-us/articles/35162878162331-Channel99-Data-Share-Snowflake
+  note: >-
+    Channel99's practical alternative to an SDK: customers consume the fact/dimension views
+    directly from Snowflake rather than through a client library.

@@ -1,0 +1,2563 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Pulsar API",
+    "description": "Channel99 Bulk Data Transfer REST API",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "/"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Auth",
+      "description": "Token issuance \u2014 `POST /auth/token`"
+    },
+    {
+      "name": "Health",
+      "description": "Service health check"
+    },
+    {
+      "name": "Impressions",
+      "description": "Ad impression events \u2014 `GET /events/impressions`"
+    },
+    {
+      "name": "Intents",
+      "description": "Buyer intent signal events \u2014 `GET /events/intents`"
+    },
+    {
+      "name": "Pageviews",
+      "description": "Website pageview events \u2014 `GET /events/pageviews`"
+    },
+    {
+      "name": "Visits",
+      "description": "Website visit events \u2014 `GET /events/visits`"
+    },
+    {
+      "name": "Ad Accounts",
+      "description": "Ad account dimension records \u2014 `GET /dimensions/ad-accounts`"
+    },
+    {
+      "name": "Ad Campaign Groups",
+      "description": "Ad campaign group dimension records \u2014 `GET /dimensions/ad-campaign-groups`"
+    },
+    {
+      "name": "Ad Campaigns",
+      "description": "Ad campaign dimension records \u2014 `GET /dimensions/ad-campaigns`"
+    },
+    {
+      "name": "Ad Groups",
+      "description": "Ad group dimension records \u2014 `GET /dimensions/ad-groups`"
+    },
+    {
+      "name": "Ad Units",
+      "description": "Ad unit dimension records \u2014 `GET /dimensions/ad-units`"
+    },
+    {
+      "name": "Ads",
+      "description": "Ad dimension records \u2014 `GET /dimensions/ads`"
+    },
+    {
+      "name": "Audiences",
+      "description": "Audience dimension records \u2014 `GET /dimensions/audiences`"
+    },
+    {
+      "name": "Channels",
+      "description": "Channel dimension records \u2014 `GET /dimensions/channels`"
+    },
+    {
+      "name": "Companies",
+      "description": "Company dimension records \u2014 `GET /dimensions/companies`"
+    },
+    {
+      "name": "Vendors",
+      "description": "Vendor dimension records \u2014 `GET /dimensions/vendors`"
+    },
+    {
+      "name": "IP Lookup",
+      "description": "Company information lookup by IP address \u2014 `GET /ip/{ipAddress}`"
+    }
+  ],
+  "paths": {
+    "/auth/token": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Issue access token",
+        "description": "Exchange an M2M client ID and secret for a bearer access token. This endpoint does not require authentication.",
+        "operationId": "postAuthToken",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "client_id",
+                  "client_secret"
+                ],
+                "properties": {
+                  "client_id": {
+                    "type": "string",
+                    "description": "The M2M client identifier",
+                    "example": "m2m-client-00000000-0000-0000-0000-000000000000"
+                  },
+                  "client_secret": {
+                    "type": "string",
+                    "description": "The M2M client secret",
+                    "example": "\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Access token issued successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "access_token",
+                    "token_type",
+                    "expires_in"
+                  ],
+                  "properties": {
+                    "access_token": {
+                      "type": "string",
+                      "description": "Bearer token to use in subsequent requests"
+                    },
+                    "token_type": {
+                      "type": "string",
+                      "enum": [
+                        "bearer"
+                      ]
+                    },
+                    "expires_in": {
+                      "type": "integer",
+                      "description": "Token lifetime in seconds",
+                      "example": 3600
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          }
+        }
+      }
+    },
+    "/health": {
+      "get": {
+        "tags": [
+          "Health"
+        ],
+        "summary": "Health check",
+        "operationId": "getHealth",
+        "responses": {
+          "200": {
+            "description": "Service is healthy",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "ok"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      }
+    },
+    "/events/impressions": {
+      "get": {
+        "tags": [
+          "Impressions"
+        ],
+        "summary": "List impressions",
+        "operationId": "getImpressions",
+        "security": [
+          {
+            "bearerAuth": [],
+            "clientId": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "x-client-id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Client identifier matching the authenticated token",
+            "example": "m2m-client-00000000-0000-0000-0000-000000000000"
+          },
+          {
+            "$ref": "#/components/parameters/cursor"
+          },
+          {
+            "$ref": "#/components/parameters/listLimit"
+          },
+          {
+            "$ref": "#/components/parameters/filterImpressions"
+          },
+          {
+            "$ref": "#/components/parameters/sortImpressions"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A page of impression records",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginatedImpressions"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request \u2013 missing instance, invalid cursor, invalid filter, invalid sort, or invalid limit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized \u2013 missing or malformed credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden \u2013 invalid token or client mismatch",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/events/intents": {
+      "get": {
+        "tags": [
+          "Intents"
+        ],
+        "summary": "List intents",
+        "operationId": "getIntents",
+        "security": [
+          {
+            "bearerAuth": [],
+            "clientId": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "x-client-id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Client identifier matching the authenticated token",
+            "example": "m2m-client-00000000-0000-0000-0000-000000000000"
+          },
+          {
+            "$ref": "#/components/parameters/cursor"
+          },
+          {
+            "$ref": "#/components/parameters/listLimit"
+          },
+          {
+            "$ref": "#/components/parameters/filterIntents"
+          },
+          {
+            "$ref": "#/components/parameters/sortIntents"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A page of intent records",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginatedIntents"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request \u2013 missing instance, invalid cursor, invalid filter, invalid sort, or invalid limit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized \u2013 missing or malformed credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden \u2013 invalid token or client mismatch",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/events/pageviews": {
+      "get": {
+        "tags": [
+          "Pageviews"
+        ],
+        "summary": "List pageviews",
+        "operationId": "getPageviews",
+        "security": [
+          {
+            "bearerAuth": [],
+            "clientId": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "x-client-id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Client identifier matching the authenticated token",
+            "example": "m2m-client-00000000-0000-0000-0000-000000000000"
+          },
+          {
+            "$ref": "#/components/parameters/cursor"
+          },
+          {
+            "$ref": "#/components/parameters/listLimit"
+          },
+          {
+            "$ref": "#/components/parameters/filterPageviews"
+          },
+          {
+            "$ref": "#/components/parameters/sortPageviews"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A page of pageview records",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginatedPageviews"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request \u2013 missing instance, invalid cursor, invalid filter, invalid sort, or invalid limit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized \u2013 missing or malformed credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden \u2013 invalid token or client mismatch",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/events/visits": {
+      "get": {
+        "tags": [
+          "Visits"
+        ],
+        "summary": "List visits",
+        "operationId": "getVisits",
+        "security": [
+          {
+            "bearerAuth": [],
+            "clientId": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "x-client-id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Client identifier matching the authenticated token",
+            "example": "m2m-client-00000000-0000-0000-0000-000000000000"
+          },
+          {
+            "$ref": "#/components/parameters/cursor"
+          },
+          {
+            "$ref": "#/components/parameters/listLimit"
+          },
+          {
+            "$ref": "#/components/parameters/filterVisits"
+          },
+          {
+            "$ref": "#/components/parameters/sortVisits"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A page of visit records",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginatedVisits"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request \u2013 missing instance, invalid cursor, invalid filter, invalid sort, or invalid limit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized \u2013 missing or malformed credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden \u2013 invalid token or client mismatch",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/dimensions/ad-accounts": {
+      "get": {
+        "tags": [
+          "Ad Accounts"
+        ],
+        "summary": "List ad accounts",
+        "operationId": "getAdAccounts",
+        "security": [
+          {
+            "bearerAuth": [],
+            "clientId": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "x-client-id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Client identifier matching the authenticated token",
+            "example": "m2m-client-00000000-0000-0000-0000-000000000000"
+          },
+          {
+            "$ref": "#/components/parameters/filterAdAccounts"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "All ad account records",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdAccountList"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request \u2013 missing instance or invalid filter",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized \u2013 missing or malformed credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden \u2013 invalid token or client mismatch",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/dimensions/ad-campaign-groups": {
+      "get": {
+        "tags": [
+          "Ad Campaign Groups"
+        ],
+        "summary": "List ad campaign groups",
+        "operationId": "getAdCampaignGroups",
+        "security": [
+          {
+            "bearerAuth": [],
+            "clientId": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "x-client-id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Client identifier matching the authenticated token",
+            "example": "m2m-client-00000000-0000-0000-0000-000000000000"
+          },
+          {
+            "$ref": "#/components/parameters/filterAdCampaignGroups"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "All ad campaign group records",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdCampaignGroupList"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request \u2013 missing instance or invalid filter",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized \u2013 missing or malformed credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden \u2013 invalid token or client mismatch",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/dimensions/ad-campaigns": {
+      "get": {
+        "tags": [
+          "Ad Campaigns"
+        ],
+        "summary": "List ad campaigns",
+        "operationId": "getAdCampaigns",
+        "security": [
+          {
+            "bearerAuth": [],
+            "clientId": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "x-client-id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Client identifier matching the authenticated token",
+            "example": "m2m-client-00000000-0000-0000-0000-000000000000"
+          },
+          {
+            "$ref": "#/components/parameters/filterAdCampaigns"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "All ad campaign records",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdCampaignList"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request \u2013 missing instance or invalid filter",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized \u2013 missing or malformed credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden \u2013 invalid token or client mismatch",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/dimensions/ad-groups": {
+      "get": {
+        "tags": [
+          "Ad Groups"
+        ],
+        "summary": "List ad groups",
+        "operationId": "getAdGroups",
+        "security": [
+          {
+            "bearerAuth": [],
+            "clientId": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "x-client-id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Client identifier matching the authenticated token",
+            "example": "m2m-client-00000000-0000-0000-0000-000000000000"
+          },
+          {
+            "$ref": "#/components/parameters/filterAdGroups"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "All ad group records",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdGroupList"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request \u2013 missing instance or invalid filter",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized \u2013 missing or malformed credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden \u2013 invalid token or client mismatch",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/dimensions/ad-units": {
+      "get": {
+        "tags": [
+          "Ad Units"
+        ],
+        "summary": "List ad units",
+        "operationId": "getAdUnits",
+        "security": [
+          {
+            "bearerAuth": [],
+            "clientId": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "x-client-id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Client identifier matching the authenticated token",
+            "example": "m2m-client-00000000-0000-0000-0000-000000000000"
+          },
+          {
+            "$ref": "#/components/parameters/filterAdUnits"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "All ad unit records",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdUnitList"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request \u2013 missing instance or invalid filter",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized \u2013 missing or malformed credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden \u2013 invalid token or client mismatch",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/dimensions/ads": {
+      "get": {
+        "tags": [
+          "Ads"
+        ],
+        "summary": "List ads",
+        "operationId": "getAds",
+        "security": [
+          {
+            "bearerAuth": [],
+            "clientId": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "x-client-id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Client identifier matching the authenticated token",
+            "example": "m2m-client-00000000-0000-0000-0000-000000000000"
+          },
+          {
+            "$ref": "#/components/parameters/filterAds"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "All ad records",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdList"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request \u2013 missing instance or invalid filter",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized \u2013 missing or malformed credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden \u2013 invalid token or client mismatch",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/dimensions/audiences": {
+      "get": {
+        "tags": [
+          "Audiences"
+        ],
+        "summary": "List audiences",
+        "operationId": "getAudiences",
+        "security": [
+          {
+            "bearerAuth": [],
+            "clientId": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "x-client-id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Client identifier matching the authenticated token",
+            "example": "m2m-client-00000000-0000-0000-0000-000000000000"
+          },
+          {
+            "$ref": "#/components/parameters/filterAudiences"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "All audience records",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AudienceList"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request \u2013 missing instance or invalid filter",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized \u2013 missing or malformed credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden \u2013 invalid token or client mismatch",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/dimensions/channels": {
+      "get": {
+        "tags": [
+          "Channels"
+        ],
+        "summary": "List channels",
+        "operationId": "getChannels",
+        "security": [
+          {
+            "bearerAuth": [],
+            "clientId": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "x-client-id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Client identifier matching the authenticated token",
+            "example": "m2m-client-00000000-0000-0000-0000-000000000000"
+          },
+          {
+            "$ref": "#/components/parameters/filterChannels"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "All channel records",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChannelList"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request \u2013 missing instance or invalid filter",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized \u2013 missing or malformed credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden \u2013 invalid token or client mismatch",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/dimensions/companies": {
+      "get": {
+        "tags": [
+          "Companies"
+        ],
+        "summary": "List companies",
+        "operationId": "getCompanies",
+        "security": [
+          {
+            "bearerAuth": [],
+            "clientId": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "x-client-id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Client identifier matching the authenticated token",
+            "example": "m2m-client-00000000-0000-0000-0000-000000000000"
+          },
+          {
+            "$ref": "#/components/parameters/filterCompanies"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "All company records",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CompanyList"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request \u2013 missing instance or invalid filter",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized \u2013 missing or malformed credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden \u2013 invalid token or client mismatch",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/ip/{ipAddress}": {
+      "get": {
+        "tags": [
+          "IP Lookup"
+        ],
+        "summary": "Get company by IP address",
+        "operationId": "getCompanyByIp",
+        "description": "Returns company information associated with the supplied IP address.\n\nCompany fields may be null when the IP address is known but a company relationship could\nnot be determined. A `404` is returned only when no record exists for the IP address. When a `404`\nis returned, our backend systems will automatically begin resolving the IP so that it becomes\navailable soon.\n\nRequires the `ip:read` scope on the Bearer token. A `403` is returned if the scope is absent.\n\n**Rate limiting:** This route has an elevated WAF per-client rate limit of 1,000 req/s\n(vs. 60 req/s for all other routes) and is exempt from the app-level data burst limit.\nA `429` is returned with a `Retry-After` header if a limit is exceeded.",
+        "security": [
+          {
+            "bearerAuth": [],
+            "clientId": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "x-client-id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Client identifier matching the authenticated token",
+            "example": "m2m-client-00000000-0000-0000-0000-000000000000"
+          },
+          {
+            "name": "ipAddress",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "IPv4 or IPv6 address to look up",
+            "example": "203.0.113.42"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Company record for the given IP address. Company fields may be null when the IP address is known but a company relationship could not be determined.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/IpCompanyRecord"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized \u2013 missing or malformed credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden \u2013 invalid token, client mismatch, or missing `ip:read` scope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/dimensions/vendors": {
+      "get": {
+        "tags": [
+          "Vendors"
+        ],
+        "summary": "List vendors",
+        "operationId": "getVendors",
+        "security": [
+          {
+            "bearerAuth": [],
+            "clientId": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "x-client-id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Client identifier matching the authenticated token",
+            "example": "m2m-client-00000000-0000-0000-0000-000000000000"
+          },
+          {
+            "$ref": "#/components/parameters/filterVendors"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "All vendor records",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VendorList"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request \u2013 missing instance or invalid filter",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized \u2013 missing or malformed credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden \u2013 invalid token or client mismatch",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "parameters": {
+      "filterAdUnits": {
+        "name": "filter",
+        "in": "query",
+        "required": false,
+        "description": "Filter results by field values using the syntax `filter[<field>][<op>]=<value>`.\n\nOperators by field type:\n- **string**: `eq`, `ne`, `in`, `notIn`, `isNull`, `isNotNull`\n- **number**: `eq`, `ne`, `gt`, `gte`, `lt`, `lte`, `in`, `notIn`, `isNull`, `isNotNull`\n- **boolean**: `eq`, `ne`, `isNull`, `isNotNull`\n- **date**: `eq`, `ne`, `gt`, `gte`, `lt`, `lte`, `isNull`, `isNotNull`\n\nFor `in` and `notIn`, provide comma-separated values: `filter[tag_id][in]=a,b,c`.\nFor `isNull` and `isNotNull`, the value is ignored.\n\nMultiple filters are combined with AND.\n\nExamples:\n- `filter[ad_unit_id][eq]=unt_abc123`\n- `filter[ad_unit_name][in]=Leaderboard,Rectangle`\n- `filter[is_deleted][eq]=false`",
+        "style": "deepObject",
+        "explode": true,
+        "schema": {
+          "type": "object"
+        }
+      },
+      "filterAds": {
+        "name": "filter",
+        "in": "query",
+        "required": false,
+        "description": "Filter results by field values using the syntax `filter[<field>][<op>]=<value>`.\n\nOperators by field type:\n- **string**: `eq`, `ne`, `in`, `notIn`, `isNull`, `isNotNull`\n- **number**: `eq`, `ne`, `gt`, `gte`, `lt`, `lte`, `in`, `notIn`, `isNull`, `isNotNull`\n- **boolean**: `eq`, `ne`, `isNull`, `isNotNull`\n- **date**: `eq`, `ne`, `gt`, `gte`, `lt`, `lte`, `isNull`, `isNotNull`\n\nFor `in` and `notIn`, provide comma-separated values: `filter[tag_id][in]=a,b,c`.\nFor `isNull` and `isNotNull`, the value is ignored.\n\nMultiple filters are combined with AND.\n\nExamples:\n- `filter[ad_id][eq]=ad_abc123`\n- `filter[ad_name][in]=Banner A,Video B`\n- `filter[is_deleted][eq]=false`",
+        "style": "deepObject",
+        "explode": true,
+        "schema": {
+          "type": "object"
+        }
+      },
+      "filterAdGroups": {
+        "name": "filter",
+        "in": "query",
+        "required": false,
+        "description": "Filter results by field values using the syntax `filter[<field>][<op>]=<value>`.\n\nOperators by field type:\n- **string**: `eq`, `ne`, `in`, `notIn`, `isNull`, `isNotNull`\n- **number**: `eq`, `ne`, `gt`, `gte`, `lt`, `lte`, `in`, `notIn`, `isNull`, `isNotNull`\n- **boolean**: `eq`, `ne`, `isNull`, `isNotNull`\n- **date**: `eq`, `ne`, `gt`, `gte`, `lt`, `lte`, `isNull`, `isNotNull`\n\nFor `in` and `notIn`, provide comma-separated values: `filter[tag_id][in]=a,b,c`.\nFor `isNull` and `isNotNull`, the value is ignored.\n\nMultiple filters are combined with AND.\n\nExamples:\n- `filter[ad_group_id][eq]=grp_abc123`\n- `filter[ad_group_name][in]=Retargeting,Prospecting`\n- `filter[is_deleted][eq]=false`",
+        "style": "deepObject",
+        "explode": true,
+        "schema": {
+          "type": "object"
+        }
+      },
+      "filterAdCampaignGroups": {
+        "name": "filter",
+        "in": "query",
+        "required": false,
+        "description": "Filter results by field values using the syntax `filter[<field>][<op>]=<value>`.\n\nOperators by field type:\n- **string**: `eq`, `ne`, `in`, `notIn`, `isNull`, `isNotNull`\n- **number**: `eq`, `ne`, `gt`, `gte`, `lt`, `lte`, `in`, `notIn`, `isNull`, `isNotNull`\n- **boolean**: `eq`, `ne`, `isNull`, `isNotNull`\n- **date**: `eq`, `ne`, `gt`, `gte`, `lt`, `lte`, `isNull`, `isNotNull`\n\nFor `in` and `notIn`, provide comma-separated values: `filter[tag_id][in]=a,b,c`.\nFor `isNull` and `isNotNull`, the value is ignored.\n\nMultiple filters are combined with AND.\n\nExamples:\n- `filter[ad_campaign_group_id][eq]=grp_abc123`\n- `filter[ad_campaign_group_name][in]=Brand,Performance`\n- `filter[is_deleted][eq]=false`",
+        "style": "deepObject",
+        "explode": true,
+        "schema": {
+          "type": "object"
+        }
+      },
+      "filterAdCampaigns": {
+        "name": "filter",
+        "in": "query",
+        "required": false,
+        "description": "Filter results by field values using the syntax `filter[<field>][<op>]=<value>`.\n\nOperators by field type:\n- **string**: `eq`, `ne`, `in`, `notIn`, `isNull`, `isNotNull`\n- **number**: `eq`, `ne`, `gt`, `gte`, `lt`, `lte`, `in`, `notIn`, `isNull`, `isNotNull`\n- **boolean**: `eq`, `ne`, `isNull`, `isNotNull`\n- **date**: `eq`, `ne`, `gt`, `gte`, `lt`, `lte`, `isNull`, `isNotNull`\n\nFor `in` and `notIn`, provide comma-separated values: `filter[tag_id][in]=a,b,c`.\nFor `isNull` and `isNotNull`, the value is ignored.\n\nMultiple filters are combined with AND.\n\nExamples:\n- `filter[ad_campaign_id][eq]=cmp_abc123`\n- `filter[ad_campaign_name][in]=Brand Awareness,Retargeting`\n- `filter[is_deleted][eq]=false`",
+        "style": "deepObject",
+        "explode": true,
+        "schema": {
+          "type": "object"
+        }
+      },
+      "filterAdAccounts": {
+        "name": "filter",
+        "in": "query",
+        "required": false,
+        "description": "Filter results by field values using the syntax `filter[<field>][<op>]=<value>`.\n\nOperators by field type:\n- **string**: `eq`, `ne`, `in`, `notIn`, `isNull`, `isNotNull`\n- **number**: `eq`, `ne`, `gt`, `gte`, `lt`, `lte`, `in`, `notIn`, `isNull`, `isNotNull`\n- **boolean**: `eq`, `ne`, `isNull`, `isNotNull`\n- **date**: `eq`, `ne`, `gt`, `gte`, `lt`, `lte`, `isNull`, `isNotNull`\n\nFor `in` and `notIn`, provide comma-separated values: `filter[tag_id][in]=a,b,c`.\nFor `isNull` and `isNotNull`, the value is ignored.\n\nMultiple filters are combined with AND.\n\nExamples:\n- `filter[ad_account_id][eq]=acc_abc123`\n- `filter[ad_account_name][in]=Brand,Prospecting`\n- `filter[is_deleted][eq]=false`",
+        "style": "deepObject",
+        "explode": true,
+        "schema": {
+          "type": "object"
+        }
+      },
+      "filterAudiences": {
+        "name": "filter",
+        "in": "query",
+        "required": false,
+        "description": "Filter results by field values using the syntax `filter[<field>][<op>]=<value>`.\n\nOperators by field type:\n- **string**: `eq`, `ne`, `in`, `notIn`, `isNull`, `isNotNull`\n- **number**: `eq`, `ne`, `gt`, `gte`, `lt`, `lte`, `in`, `notIn`, `isNull`, `isNotNull`\n- **boolean**: `eq`, `ne`, `isNull`, `isNotNull`\n- **date**: `eq`, `ne`, `gt`, `gte`, `lt`, `lte`, `isNull`, `isNotNull`\n\nFor `in` and `notIn`, provide comma-separated values: `filter[tag_id][in]=a,b,c`.\nFor `isNull` and `isNotNull`, the value is ignored.\n\nMultiple filters are combined with AND.\n\nExamples:\n- `filter[audience_id][eq]=aud_abc123`\n- `filter[audience_name][in]=Retargeting,Prospecting`\n- `filter[is_deleted][eq]=false`",
+        "style": "deepObject",
+        "explode": true,
+        "schema": {
+          "type": "object"
+        }
+      },
+      "filterCompanies": {
+        "name": "filter",
+        "in": "query",
+        "required": false,
+        "description": "Filter results by field values using the syntax `filter[<field>][<op>]=<value>`.\n\nOperators by field type:\n- **string**: `eq`, `ne`, `in`, `notIn`, `isNull`, `isNotNull`\n- **number**: `eq`, `ne`, `gt`, `gte`, `lt`, `lte`, `in`, `notIn`, `isNull`, `isNotNull`\n- **boolean**: `eq`, `ne`, `isNull`, `isNotNull`\n- **date**: `eq`, `ne`, `gt`, `gte`, `lt`, `lte`, `isNull`, `isNotNull`\n\nFor `in` and `notIn`, provide comma-separated values: `filter[tag_id][in]=a,b,c`.\nFor `isNull` and `isNotNull`, the value is ignored.\n\nMultiple filters are combined with AND.\n\nExamples:\n- `filter[company_id][eq]=cmp_abc123`\n- `filter[company_name][in]=Acme,Globex`\n- `filter[sector_id][eq]=sec_123`\n- `filter[region_id][eq]=reg_456`\n- `filter[revenue_range_id][eq]=rev_789`",
+        "style": "deepObject",
+        "explode": true,
+        "schema": {
+          "type": "object"
+        }
+      },
+      "filterVendors": {
+        "name": "filter",
+        "in": "query",
+        "required": false,
+        "description": "Filter results by field values using the syntax `filter[<field>][<op>]=<value>`.\n\nOperators by field type:\n- **string**: `eq`, `ne`, `in`, `notIn`, `isNull`, `isNotNull`\n- **number**: `eq`, `ne`, `gt`, `gte`, `lt`, `lte`, `in`, `notIn`, `isNull`, `isNotNull`\n- **boolean**: `eq`, `ne`, `isNull`, `isNotNull`\n- **date**: `eq`, `ne`, `gt`, `gte`, `lt`, `lte`, `isNull`, `isNotNull`\n\nFor `in` and `notIn`, provide comma-separated values: `filter[tag_id][in]=a,b,c`.\nFor `isNull` and `isNotNull`, the value is ignored.\n\nMultiple filters are combined with AND.\n\nExamples:\n- `filter[vendor_id][eq]=vnd_abc123`\n- `filter[vendor_name][in]=Google,LinkedIn`",
+        "style": "deepObject",
+        "explode": true,
+        "schema": {
+          "type": "object"
+        }
+      },
+      "filterChannels": {
+        "name": "filter",
+        "in": "query",
+        "required": false,
+        "description": "Filter results by field values using the syntax `filter[<field>][<op>]=<value>`.\n\nOperators by field type:\n- **string**: `eq`, `ne`, `in`, `notIn`, `isNull`, `isNotNull`\n- **number**: `eq`, `ne`, `gt`, `gte`, `lt`, `lte`, `in`, `notIn`, `isNull`, `isNotNull`\n- **boolean**: `eq`, `ne`, `isNull`, `isNotNull`\n- **date**: `eq`, `ne`, `gt`, `gte`, `lt`, `lte`, `isNull`, `isNotNull`\n\nFor `in` and `notIn`, provide comma-separated values: `filter[tag_id][in]=a,b,c`.\nFor `isNull` and `isNotNull`, the value is ignored.\n\nMultiple filters are combined with AND.\n\nExamples:\n- `filter[channel_id][eq]=ch_abc123`\n- `filter[channel_name][in]=Display,Paid Search`",
+        "style": "deepObject",
+        "explode": true,
+        "schema": {
+          "type": "object"
+        }
+      },
+      "filterIntents": {
+        "name": "filter",
+        "in": "query",
+        "required": false,
+        "description": "Filter results by field values using the syntax `filter[<field>][<op>]=<value>`.\n\nOperators by field type:\n- **string**: `eq`, `ne`, `in`, `notIn`, `isNull`, `isNotNull`\n- **number**: `eq`, `ne`, `gt`, `gte`, `lt`, `lte`, `in`, `notIn`, `isNull`, `isNotNull`\n- **boolean**: `eq`, `ne`, `isNull`, `isNotNull`\n- **date**: `eq`, `ne`, `gt`, `gte`, `lt`, `lte`, `isNull`, `isNotNull`\n\nFor `in` and `notIn`, provide comma-separated values: `filter[tag_id][in]=a,b,c`.\nFor `isNull` and `isNotNull`, the value is ignored.\n\nMultiple filters are combined with AND.\n\nExamples:\n- `filter[event_date][gte]=2024-01-01`\n- `filter[company_id][eq]=abc123`\n- `filter[intent_type][eq]=category`\n- `filter[signal_type][isNull]=true`\n- `filter[channel_id][in]=ch1,ch2`",
+        "style": "deepObject",
+        "explode": true,
+        "schema": {
+          "type": "object"
+        }
+      },
+      "filterImpressions": {
+        "name": "filter",
+        "in": "query",
+        "required": false,
+        "description": "Filter results by field values using the syntax `filter[<field>][<op>]=<value>`.\n\nOperators by field type:\n- **string**: `eq`, `ne`, `in`, `notIn`, `isNull`, `isNotNull`\n- **number**: `eq`, `ne`, `gt`, `gte`, `lt`, `lte`, `in`, `notIn`, `isNull`, `isNotNull`\n- **boolean**: `eq`, `ne`, `isNull`, `isNotNull`\n- **date**: `eq`, `ne`, `gt`, `gte`, `lt`, `lte`, `isNull`, `isNotNull`\n\nFor `in` and `notIn`, provide comma-separated values: `filter[tag_id][in]=a,b,c`.\nFor `isNull` and `isNotNull`, the value is ignored.\n\nMultiple filters are combined with AND.\n\nExamples:\n- `filter[event_date][gte]=2024-01-01`\n- `filter[company_id][eq]=abc123`\n- `filter[has_click][eq]=true`\n- `filter[ad_campaign_id][isNull]=true`\n- `filter[tag_id][in]=foo,bar`",
+        "style": "deepObject",
+        "explode": true,
+        "schema": {
+          "type": "object"
+        }
+      },
+      "filterPageviews": {
+        "name": "filter",
+        "in": "query",
+        "required": false,
+        "description": "Filter results by field values using the syntax `filter[<field>][<op>]=<value>`.\n\nOperators by field type:\n- **string**: `eq`, `ne`, `in`, `notIn`, `isNull`, `isNotNull`\n- **number**: `eq`, `ne`, `gt`, `gte`, `lt`, `lte`, `in`, `notIn`, `isNull`, `isNotNull`\n- **boolean**: `eq`, `ne`, `isNull`, `isNotNull`\n- **date**: `eq`, `ne`, `gt`, `gte`, `lt`, `lte`, `isNull`, `isNotNull`\n\nFor `in` and `notIn`, provide comma-separated values: `filter[tag_id][in]=a,b,c`.\nFor `isNull` and `isNotNull`, the value is ignored.\n\nMultiple filters are combined with AND.\n\nExamples:\n- `filter[event_date][gte]=2024-01-01&filter[event_date][lte]=2024-12-31`\n- `filter[tag_id][in]=foo,bar`\n- `filter[current_page][eq]=/products`\n- `filter[channel_id][isNull]=true`",
+        "style": "deepObject",
+        "explode": true,
+        "schema": {
+          "type": "object"
+        }
+      },
+      "filterVisits": {
+        "name": "filter",
+        "in": "query",
+        "required": false,
+        "description": "Filter results by field values using the syntax `filter[<field>][<op>]=<value>`.\n\nOperators by field type:\n- **string**: `eq`, `ne`, `in`, `notIn`, `isNull`, `isNotNull`\n- **number**: `eq`, `ne`, `gt`, `gte`, `lt`, `lte`, `in`, `notIn`, `isNull`, `isNotNull`\n- **boolean**: `eq`, `ne`, `isNull`, `isNotNull`\n- **date**: `eq`, `ne`, `gt`, `gte`, `lt`, `lte`, `isNull`, `isNotNull`\n\nFor `in` and `notIn`, provide comma-separated values: `filter[tag_id][in]=a,b,c`.\nFor `isNull` and `isNotNull`, the value is ignored.\n\nMultiple filters are combined with AND.\n\nExamples:\n- `filter[event_date][gte]=2024-01-01`\n- `filter[channel_id][isNull]=true`\n- `filter[c99_user_cookie_id][eq]=usr_abc123`\n- `filter[ad_campaign_id][in]=camp1,camp2`",
+        "style": "deepObject",
+        "explode": true,
+        "schema": {
+          "type": "object"
+        }
+      },
+      "sortImpressions": {
+        "name": "sort",
+        "in": "query",
+        "required": false,
+        "description": "Sort results by a single field using the syntax `sort[<field>]=asc|desc`.\n\nSortable fields: `event_date`.\n\nExamples:\n- `sort[event_date]=desc`",
+        "style": "form",
+        "explode": true
+      },
+      "sortPageviews": {
+        "name": "sort",
+        "in": "query",
+        "required": false,
+        "description": "Sort results by a single field using the syntax `sort[<field>]=asc|desc`.\n\nSortable fields: `event_date`.\n\nExamples:\n- `sort[event_date]=desc`",
+        "style": "form",
+        "explode": true
+      },
+      "sortIntents": {
+        "name": "sort",
+        "in": "query",
+        "required": false,
+        "description": "Sort results by a single field using the syntax `sort[<field>]=asc|desc`.\n\nSortable fields: `event_date`, `count_impressions`.\n\nExamples:\n- `sort[event_date]=desc`\n- `sort[count_impressions]=desc`",
+        "style": "form",
+        "explode": true
+      },
+      "sortVisits": {
+        "name": "sort",
+        "in": "query",
+        "required": false,
+        "description": "Sort results by a single field using the syntax `sort[<field>]=asc|desc`.\n\nSortable fields: `event_date`.\n\nExamples:\n- `sort[event_date]=desc`",
+        "style": "form",
+        "explode": true
+      },
+      "cursor": {
+        "name": "cursor",
+        "in": "query",
+        "required": false,
+        "description": "Opaque pagination token from the previous response\u2019s `nextCursor`. Omit on the first page.\n\nPage size is controlled by the `limit` query parameter (default 200, maximum 1000).",
+        "schema": {
+          "type": "string"
+        }
+      },
+      "listLimit": {
+        "name": "limit",
+        "in": "query",
+        "required": false,
+        "description": "Maximum number of records to return in this page.\nOmit to use the default (200); the maximum allowed value is 1000.\nValues above the maximum return HTTP 400 with code `err:pulsar.request.invalid-limit`.",
+        "schema": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 1000
+        }
+      }
+    },
+    "responses": {
+      "BadRequest": {
+        "description": "Bad request \u2013 missing client_id or client_secret (code `err:pulsar.auth.missing-credentials`)",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            }
+          }
+        }
+      },
+      "Unauthorized": {
+        "description": "Unauthorized \u2013 invalid client_id or client_secret (code `err:pulsar.auth.invalid-credentials`)",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            }
+          }
+        }
+      },
+      "NotFound": {
+        "description": "Not found \u2013 no matching route or resource (code `err:pulsar.core.not-found`)",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            }
+          }
+        }
+      },
+      "TooManyRequests": {
+        "description": "Rate limit exceeded \u2013 too many requests from this client.\n\nLimits:\n- `POST /auth/token`: 20 req/min per `client_id` (app), plus WAF per-IP limit\n- `/events/*` and `/dimensions/*`: burst limit of 100 req / 10s per client (app)\n- All authenticated routes: WAF 60 req/s per `x-client-id` (5-minute window)\n- `/ip/*` routes: WAF elevated tier (app burst limit does not apply)\n\nApp-level limits can be disabled via `PULSAR_APP_RATE_LIMITS=0|false|off` (WAF still applies).",
+        "headers": {
+          "Retry-After": {
+            "description": "Number of seconds to wait before retrying",
+            "schema": {
+              "type": "integer",
+              "example": 60
+            }
+          }
+        },
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            }
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "description": "M2M Bearer token issued by Stytch. Pass as `Authorization: Bearer <token>`.\n\nExample: `Authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...`"
+      },
+      "clientId": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "x-client-id",
+        "description": "Client identifier that must match the `client_id` claim in the Bearer token.\n\nExample: `x-client-id: m2m-client-00000000-0000-0000-0000-000000000000`"
+      }
+    },
+    "schemas": {
+      "PaginatedIntents": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Intent"
+            }
+          },
+          "nextCursor": {
+            "type": "string",
+            "nullable": true,
+            "description": "Pass as the `cursor` query parameter to fetch the next page, or null when there are no more results."
+          }
+        },
+        "required": [
+          "data",
+          "nextCursor"
+        ]
+      },
+      "PaginatedImpressions": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Impression"
+            }
+          },
+          "nextCursor": {
+            "type": "string",
+            "nullable": true,
+            "description": "Pass as the `cursor` query parameter to fetch the next page, or null when there are no more results."
+          }
+        },
+        "required": [
+          "data",
+          "nextCursor"
+        ]
+      },
+      "PaginatedPageviews": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Pageview"
+            }
+          },
+          "nextCursor": {
+            "type": "string",
+            "nullable": true,
+            "description": "Pass as the `cursor` query parameter to fetch the next page, or null when there are no more results."
+          }
+        },
+        "required": [
+          "data",
+          "nextCursor"
+        ]
+      },
+      "PaginatedVisits": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Visit"
+            }
+          },
+          "nextCursor": {
+            "type": "string",
+            "nullable": true,
+            "description": "Pass as the `cursor` query parameter to fetch the next page, or null when there are no more results."
+          }
+        },
+        "required": [
+          "data",
+          "nextCursor"
+        ]
+      },
+      "Intent": {
+        "type": "object",
+        "properties": {
+          "intent_event_id": {
+            "type": "string"
+          },
+          "event_date": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "channel_id": {
+            "type": "string",
+            "nullable": true
+          },
+          "vendor_id": {
+            "type": "string",
+            "nullable": true
+          },
+          "company_id": {
+            "type": "string"
+          },
+          "audience_id_list": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "intent_id": {
+            "type": "string"
+          },
+          "intent_type": {
+            "type": "string",
+            "nullable": true
+          },
+          "intent_name": {
+            "type": "string",
+            "nullable": true
+          },
+          "signal_type": {
+            "type": "string",
+            "nullable": true
+          },
+          "count_impressions": {
+            "type": "integer"
+          }
+        }
+      },
+      "Impression": {
+        "type": "object",
+        "properties": {
+          "imp_event_id": {
+            "type": "string"
+          },
+          "event_date": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "channel_id": {
+            "type": "string",
+            "nullable": true
+          },
+          "vendor_id": {
+            "type": "string",
+            "nullable": true
+          },
+          "tag_id": {
+            "type": "string"
+          },
+          "company_id": {
+            "type": "string"
+          },
+          "audience_id_list": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "ad_account_id": {
+            "type": "string",
+            "nullable": true
+          },
+          "ad_campaign_group_id": {
+            "type": "string",
+            "nullable": true
+          },
+          "ad_campaign_id": {
+            "type": "string",
+            "nullable": true
+          },
+          "ad_group_id": {
+            "type": "string",
+            "nullable": true
+          },
+          "ad_id": {
+            "type": "string",
+            "nullable": true
+          },
+          "ad_detail_id": {
+            "type": "string",
+            "nullable": true
+          },
+          "ad_site": {
+            "type": "string",
+            "nullable": true
+          },
+          "ad_unit_id": {
+            "type": "string",
+            "nullable": true
+          },
+          "has_click": {
+            "type": "boolean"
+          }
+        }
+      },
+      "Pageview": {
+        "type": "object",
+        "properties": {
+          "pv_event_id": {
+            "type": "string"
+          },
+          "visit_event_id": {
+            "type": "string",
+            "nullable": true
+          },
+          "event_date": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "channel_id": {
+            "type": "string",
+            "nullable": true
+          },
+          "vendor_id": {
+            "type": "string",
+            "nullable": true
+          },
+          "tag_id": {
+            "type": "string"
+          },
+          "company_id": {
+            "type": "string"
+          },
+          "audience_id_list": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "ad_account_id": {
+            "type": "string",
+            "nullable": true
+          },
+          "ad_campaign_group_id": {
+            "type": "string",
+            "nullable": true
+          },
+          "ad_campaign_id": {
+            "type": "string",
+            "nullable": true
+          },
+          "ad_group_id": {
+            "type": "string",
+            "nullable": true
+          },
+          "ad_id": {
+            "type": "string",
+            "nullable": true
+          },
+          "ad_detail_id": {
+            "type": "string",
+            "nullable": true
+          },
+          "current_page": {
+            "type": "string"
+          },
+          "c99_user_cookie_id": {
+            "type": "string"
+          }
+        }
+      },
+      "Visit": {
+        "type": "object",
+        "properties": {
+          "visit_event_id": {
+            "type": "string"
+          },
+          "event_date": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "channel_id": {
+            "type": "string",
+            "nullable": true
+          },
+          "vendor_id": {
+            "type": "string",
+            "nullable": true
+          },
+          "tag_id": {
+            "type": "string"
+          },
+          "company_id": {
+            "type": "string"
+          },
+          "audience_id_list": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "ad_account_id": {
+            "type": "string",
+            "nullable": true
+          },
+          "ad_campaign_group_id": {
+            "type": "string",
+            "nullable": true
+          },
+          "ad_campaign_id": {
+            "type": "string",
+            "nullable": true
+          },
+          "ad_group_id": {
+            "type": "string",
+            "nullable": true
+          },
+          "ad_id": {
+            "type": "string",
+            "nullable": true
+          },
+          "ad_detail_id": {
+            "type": "string",
+            "nullable": true
+          },
+          "current_page": {
+            "type": "string"
+          },
+          "c99_user_cookie_id": {
+            "type": "string"
+          }
+        }
+      },
+      "AdUnitList": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AdUnit"
+            }
+          }
+        },
+        "required": [
+          "data"
+        ]
+      },
+      "AdUnit": {
+        "type": "object",
+        "properties": {
+          "ad_unit_id": {
+            "type": "string"
+          },
+          "ad_unit_name": {
+            "type": "string"
+          },
+          "is_deleted": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "ad_unit_id",
+          "ad_unit_name",
+          "is_deleted"
+        ]
+      },
+      "AdList": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Ad"
+            }
+          }
+        },
+        "required": [
+          "data"
+        ]
+      },
+      "Ad": {
+        "type": "object",
+        "properties": {
+          "ad_id": {
+            "type": "string"
+          },
+          "ad_name": {
+            "type": "string"
+          },
+          "is_deleted": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "ad_id",
+          "ad_name",
+          "is_deleted"
+        ]
+      },
+      "AdGroupList": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AdGroup"
+            }
+          }
+        },
+        "required": [
+          "data"
+        ]
+      },
+      "AdGroup": {
+        "type": "object",
+        "properties": {
+          "ad_group_id": {
+            "type": "string"
+          },
+          "ad_group_name": {
+            "type": "string"
+          },
+          "is_deleted": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "ad_group_id",
+          "ad_group_name",
+          "is_deleted"
+        ]
+      },
+      "AdCampaignGroupList": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AdCampaignGroup"
+            }
+          }
+        },
+        "required": [
+          "data"
+        ]
+      },
+      "AdCampaignGroup": {
+        "type": "object",
+        "properties": {
+          "ad_campaign_group_id": {
+            "type": "string"
+          },
+          "ad_campaign_group_name": {
+            "type": "string"
+          },
+          "is_deleted": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "ad_campaign_group_id",
+          "ad_campaign_group_name",
+          "is_deleted"
+        ]
+      },
+      "AdCampaignList": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AdCampaign"
+            }
+          }
+        },
+        "required": [
+          "data"
+        ]
+      },
+      "AdCampaign": {
+        "type": "object",
+        "properties": {
+          "ad_campaign_id": {
+            "type": "string"
+          },
+          "ad_campaign_name": {
+            "type": "string"
+          },
+          "is_deleted": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "ad_campaign_id",
+          "ad_campaign_name",
+          "is_deleted"
+        ]
+      },
+      "AdAccountList": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AdAccount"
+            }
+          }
+        },
+        "required": [
+          "data"
+        ]
+      },
+      "AdAccount": {
+        "type": "object",
+        "properties": {
+          "ad_account_id": {
+            "type": "string"
+          },
+          "ad_account_name": {
+            "type": "string"
+          },
+          "is_deleted": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "ad_account_id",
+          "ad_account_name",
+          "is_deleted"
+        ]
+      },
+      "AudienceList": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Audience"
+            }
+          }
+        },
+        "required": [
+          "data"
+        ]
+      },
+      "Audience": {
+        "type": "object",
+        "properties": {
+          "audience_id": {
+            "type": "string"
+          },
+          "audience_name": {
+            "type": "string"
+          },
+          "audience_description": {
+            "type": "string"
+          },
+          "is_deleted": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "audience_id",
+          "audience_name",
+          "audience_description",
+          "is_deleted"
+        ]
+      },
+      "CompanyList": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Company"
+            }
+          }
+        },
+        "required": [
+          "data"
+        ]
+      },
+      "Company": {
+        "type": "object",
+        "properties": {
+          "company_id": {
+            "type": "string"
+          },
+          "company_domain": {
+            "type": "string"
+          },
+          "company_name": {
+            "type": "string"
+          },
+          "sector_id": {
+            "type": "string"
+          },
+          "region_id": {
+            "type": "string"
+          },
+          "revenue_range_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "company_id",
+          "company_domain",
+          "company_name",
+          "sector_id",
+          "region_id",
+          "revenue_range_id"
+        ]
+      },
+      "VendorList": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Vendor"
+            }
+          }
+        },
+        "required": [
+          "data"
+        ]
+      },
+      "Vendor": {
+        "type": "object",
+        "properties": {
+          "vendor_id": {
+            "type": "string"
+          },
+          "vendor_name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "vendor_id",
+          "vendor_name"
+        ]
+      },
+      "ChannelList": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Channel"
+            }
+          }
+        },
+        "required": [
+          "data"
+        ]
+      },
+      "Channel": {
+        "type": "object",
+        "properties": {
+          "channel_id": {
+            "type": "string"
+          },
+          "channel_name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "channel_id",
+          "channel_name"
+        ]
+      },
+      "IpCompanyRecord": {
+        "type": "object",
+        "description": "Company information associated with an IP address. Company fields may be null when the IP address is known but a company relationship could not be determined.",
+        "properties": {
+          "ip_address": {
+            "type": "string",
+            "example": "203.0.113.42"
+          },
+          "company_domain": {
+            "type": "string",
+            "nullable": true,
+            "example": "acme.com",
+            "description": "Null when the company relationship for this IP could not be resolved."
+          },
+          "company_name": {
+            "type": "string",
+            "nullable": true,
+            "example": "Acme Corp",
+            "description": "Null when the company relationship for this IP could not be resolved."
+          },
+          "region_name": {
+            "type": "string",
+            "nullable": true,
+            "example": "North America",
+            "description": "Null when the company relationship for this IP could not be resolved."
+          },
+          "rev_range_name": {
+            "type": "string",
+            "nullable": true,
+            "example": "$100M\u2013$500M",
+            "description": "Null when the company relationship for this IP could not be resolved."
+          },
+          "sector_name": {
+            "type": "string",
+            "nullable": true,
+            "example": "Technology",
+            "description": "Null when the company relationship for this IP could not be resolved."
+          }
+        },
+        "required": [
+          "ip_address"
+        ]
+      },
+      "Error": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "string",
+            "description": "Error class name"
+          },
+          "code": {
+            "type": "string",
+            "description": "Machine-readable error code (e.g. `err:pulsar.request.invalid-limit`, `err:pulsar.core.not-found`)",
+            "example": "err:pulsar.request.invalid-limit"
+          },
+          "message": {
+            "type": "string",
+            "description": "Human-readable description"
+          }
+        },
+        "required": [
+          "error",
+          "code",
+          "message"
+        ]
+      }
+    }
+  }
+}

@@ -1,7 +1,21 @@
 ---
 generated: '2026-07-18'
+rechecked: '2026-08-12'
 method: searched
 source: https://www.channel99.com/llms.txt
+delivery: >-
+  As of 2026-08-12 https://www.channel99.com/llms.txt does not serve this document itself: it
+  answers HTTP 308 and redirects to
+  https://gist.githubusercontent.com/myatman2014/6789e78c263bb8d7aaf8aaefafa44ad6/raw/53f762ee3c915922a71a87b1f72eeaa028a87771/llms.txt
+  - a raw file on a third-party personal GitHub gist account, pinned to one commit. The body is
+  byte-identical to the copy captured on 2026-07-18, so the content is unchanged and still
+  Channel99's, but the agent-facing document is no longer served from a Channel99-controlled
+  origin and can be changed or deleted by an account Channel99 does not appear to own. Worth
+  raising with the provider.
+coverage_note: >-
+  This llms.txt covers the marketing site only. It names no developer surface - not the Pulsar
+  Reporting API, not the MCP server, not the Snowflake data share - so an agent reading it would
+  conclude Channel99 has no API.
 ---
 # Official Home Page
 
