@@ -1,0 +1,679 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Pulsar API",
+    "version": "1.0.0"
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Auth",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Issue access token",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "/auth/token",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Exchange an M2M client ID and secret for a bearer access token. This endpoint does not require authentication."
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "Health",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Health check",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "/health"
+          },
+          "docs": "Health check"
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "Impressions",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "List impressions",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "/events/impressions",
+            "headers": [
+              {
+                "name": "x-client-id",
+                "value": "m2m-client-00000000-0000-0000-0000-000000000000"
+              }
+            ],
+            "params": [
+              {
+                "name": "cursor",
+                "value": "",
+                "type": "query",
+                "description": "Opaque pagination token from the previous response’s `nextCursor`. Omit on the first page.\n\nPage size is controlled by the `limit` query parameter (default 200, maximum 1000)."
+              },
+              {
+                "name": "limit",
+                "value": "",
+                "type": "query",
+                "description": "Maximum number of records to return in this page.\nOmit to use the default (200); the maximum allowed value is 1000.\nValues above the maximum return HTTP 400 with code `err:pulsar.request.invalid-limit`."
+              },
+              {
+                "name": "filter",
+                "value": "",
+                "type": "query",
+                "description": "Filter results by field values using the syntax `filter[<field>][<op>]=<value>`.\n\nOperators by field type:\n- **string**: `eq`, `ne`, `in`, `notIn`, `isNull`, `isNotNull`\n- **number**: `eq`, `ne`, `gt`, `gte`, `lt`, `lte`, `in`, `notIn`, `isNull`, `isNotNull`\n- **boolean**: `eq`, `ne`, `isNull`, `isNotNull`\n- **date**: `eq`, `ne`, `gt`, `gte`, `lt`, `lte`, `isNull`, `isNotNull`\n\nFor `in` and `notIn`, provide comma-separated values: `filter[tag_id][in]=a,b,c`.\nFor `isNull` and `isNotNull`, the value is ignored.\n\nMultiple filters are combined with AND.\n\nExamples:\n- `filter[event_date][gte]=2024-01-01`\n- `filter[company_id][eq]=abc123`\n- `filter[has_click][eq]=true`\n- `filter[ad_campaign_id][isNull]=true`\n- `filter[tag_id][in]=foo,bar`"
+              },
+              {
+                "name": "sort",
+                "value": "",
+                "type": "query",
+                "description": "Sort results by a single field using the syntax `sort[<field>]=asc|desc`.\n\nSortable fields: `event_date`.\n\nExamples:\n- `sort[event_date]=desc`"
+              }
+            ],
+            "auth": {
+              "type": "bearer",
+              "token": "{{bearerToken}}"
+            }
+          },
+          "docs": "List impressions"
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "Intents",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "List intents",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "/events/intents",
+            "headers": [
+              {
+                "name": "x-client-id",
+                "value": "m2m-client-00000000-0000-0000-0000-000000000000"
+              }
+            ],
+            "params": [
+              {
+                "name": "cursor",
+                "value": "",
+                "type": "query",
+                "description": "Opaque pagination token from the previous response’s `nextCursor`. Omit on the first page.\n\nPage size is controlled by the `limit` query parameter (default 200, maximum 1000)."
+              },
+              {
+                "name": "limit",
+                "value": "",
+                "type": "query",
+                "description": "Maximum number of records to return in this page.\nOmit to use the default (200); the maximum allowed value is 1000.\nValues above the maximum return HTTP 400 with code `err:pulsar.request.invalid-limit`."
+              },
+              {
+                "name": "filter",
+                "value": "",
+                "type": "query",
+                "description": "Filter results by field values using the syntax `filter[<field>][<op>]=<value>`.\n\nOperators by field type:\n- **string**: `eq`, `ne`, `in`, `notIn`, `isNull`, `isNotNull`\n- **number**: `eq`, `ne`, `gt`, `gte`, `lt`, `lte`, `in`, `notIn`, `isNull`, `isNotNull`\n- **boolean**: `eq`, `ne`, `isNull`, `isNotNull`\n- **date**: `eq`, `ne`, `gt`, `gte`, `lt`, `lte`, `isNull`, `isNotNull`\n\nFor `in` and `notIn`, provide comma-separated values: `filter[tag_id][in]=a,b,c`.\nFor `isNull` and `isNotNull`, the value is ignored.\n\nMultiple filters are combined with AND.\n\nExamples:\n- `filter[event_date][gte]=2024-01-01`\n- `filter[company_id][eq]=abc123`\n- `filter[intent_type][eq]=category`\n- `filter[signal_type][isNull]=true`\n- `filter[channel_id][in]=ch1,ch2`"
+              },
+              {
+                "name": "sort",
+                "value": "",
+                "type": "query",
+                "description": "Sort results by a single field using the syntax `sort[<field>]=asc|desc`.\n\nSortable fields: `event_date`, `count_impressions`.\n\nExamples:\n- `sort[event_date]=desc`\n- `sort[count_impressions]=desc`"
+              }
+            ],
+            "auth": {
+              "type": "bearer",
+              "token": "{{bearerToken}}"
+            }
+          },
+          "docs": "List intents"
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "Pageviews",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "List pageviews",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "/events/pageviews",
+            "headers": [
+              {
+                "name": "x-client-id",
+                "value": "m2m-client-00000000-0000-0000-0000-000000000000"
+              }
+            ],
+            "params": [
+              {
+                "name": "cursor",
+                "value": "",
+                "type": "query",
+                "description": "Opaque pagination token from the previous response’s `nextCursor`. Omit on the first page.\n\nPage size is controlled by the `limit` query parameter (default 200, maximum 1000)."
+              },
+              {
+                "name": "limit",
+                "value": "",
+                "type": "query",
+                "description": "Maximum number of records to return in this page.\nOmit to use the default (200); the maximum allowed value is 1000.\nValues above the maximum return HTTP 400 with code `err:pulsar.request.invalid-limit`."
+              },
+              {
+                "name": "filter",
+                "value": "",
+                "type": "query",
+                "description": "Filter results by field values using the syntax `filter[<field>][<op>]=<value>`.\n\nOperators by field type:\n- **string**: `eq`, `ne`, `in`, `notIn`, `isNull`, `isNotNull`\n- **number**: `eq`, `ne`, `gt`, `gte`, `lt`, `lte`, `in`, `notIn`, `isNull`, `isNotNull`\n- **boolean**: `eq`, `ne`, `isNull`, `isNotNull`\n- **date**: `eq`, `ne`, `gt`, `gte`, `lt`, `lte`, `isNull`, `isNotNull`\n\nFor `in` and `notIn`, provide comma-separated values: `filter[tag_id][in]=a,b,c`.\nFor `isNull` and `isNotNull`, the value is ignored.\n\nMultiple filters are combined with AND.\n\nExamples:\n- `filter[event_date][gte]=2024-01-01&filter[event_date][lte]=2024-12-31`\n- `filter[tag_id][in]=foo,bar`\n- `filter[current_page][eq]=/products`\n- `filter[channel_id][isNull]=true`"
+              },
+              {
+                "name": "sort",
+                "value": "",
+                "type": "query",
+                "description": "Sort results by a single field using the syntax `sort[<field>]=asc|desc`.\n\nSortable fields: `event_date`.\n\nExamples:\n- `sort[event_date]=desc`"
+              }
+            ],
+            "auth": {
+              "type": "bearer",
+              "token": "{{bearerToken}}"
+            }
+          },
+          "docs": "List pageviews"
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "Visits",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "List visits",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "/events/visits",
+            "headers": [
+              {
+                "name": "x-client-id",
+                "value": "m2m-client-00000000-0000-0000-0000-000000000000"
+              }
+            ],
+            "params": [
+              {
+                "name": "cursor",
+                "value": "",
+                "type": "query",
+                "description": "Opaque pagination token from the previous response’s `nextCursor`. Omit on the first page.\n\nPage size is controlled by the `limit` query parameter (default 200, maximum 1000)."
+              },
+              {
+                "name": "limit",
+                "value": "",
+                "type": "query",
+                "description": "Maximum number of records to return in this page.\nOmit to use the default (200); the maximum allowed value is 1000.\nValues above the maximum return HTTP 400 with code `err:pulsar.request.invalid-limit`."
+              },
+              {
+                "name": "filter",
+                "value": "",
+                "type": "query",
+                "description": "Filter results by field values using the syntax `filter[<field>][<op>]=<value>`.\n\nOperators by field type:\n- **string**: `eq`, `ne`, `in`, `notIn`, `isNull`, `isNotNull`\n- **number**: `eq`, `ne`, `gt`, `gte`, `lt`, `lte`, `in`, `notIn`, `isNull`, `isNotNull`\n- **boolean**: `eq`, `ne`, `isNull`, `isNotNull`\n- **date**: `eq`, `ne`, `gt`, `gte`, `lt`, `lte`, `isNull`, `isNotNull`\n\nFor `in` and `notIn`, provide comma-separated values: `filter[tag_id][in]=a,b,c`.\nFor `isNull` and `isNotNull`, the value is ignored.\n\nMultiple filters are combined with AND.\n\nExamples:\n- `filter[event_date][gte]=2024-01-01`\n- `filter[channel_id][isNull]=true`\n- `filter[c99_user_cookie_id][eq]=usr_abc123`\n- `filter[ad_campaign_id][in]=camp1,camp2`"
+              },
+              {
+                "name": "sort",
+                "value": "",
+                "type": "query",
+                "description": "Sort results by a single field using the syntax `sort[<field>]=asc|desc`.\n\nSortable fields: `event_date`.\n\nExamples:\n- `sort[event_date]=desc`"
+              }
+            ],
+            "auth": {
+              "type": "bearer",
+              "token": "{{bearerToken}}"
+            }
+          },
+          "docs": "List visits"
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "Ad Accounts",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "List ad accounts",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "/dimensions/ad-accounts",
+            "headers": [
+              {
+                "name": "x-client-id",
+                "value": "m2m-client-00000000-0000-0000-0000-000000000000"
+              }
+            ],
+            "params": [
+              {
+                "name": "filter",
+                "value": "",
+                "type": "query",
+                "description": "Filter results by field values using the syntax `filter[<field>][<op>]=<value>`.\n\nOperators by field type:\n- **string**: `eq`, `ne`, `in`, `notIn`, `isNull`, `isNotNull`\n- **number**: `eq`, `ne`, `gt`, `gte`, `lt`, `lte`, `in`, `notIn`, `isNull`, `isNotNull`\n- **boolean**: `eq`, `ne`, `isNull`, `isNotNull`\n- **date**: `eq`, `ne`, `gt`, `gte`, `lt`, `lte`, `isNull`, `isNotNull`\n\nFor `in` and `notIn`, provide comma-separated values: `filter[tag_id][in]=a,b,c`.\nFor `isNull` and `isNotNull`, the value is ignored.\n\nMultiple filters are combined with AND.\n\nExamples:\n- `filter[ad_account_id][eq]=acc_abc123`\n- `filter[ad_account_name][in]=Brand,Prospecting`\n- `filter[is_deleted][eq]=false`"
+              }
+            ],
+            "auth": {
+              "type": "bearer",
+              "token": "{{bearerToken}}"
+            }
+          },
+          "docs": "List ad accounts"
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "Ad Campaign Groups",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "List ad campaign groups",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "/dimensions/ad-campaign-groups",
+            "headers": [
+              {
+                "name": "x-client-id",
+                "value": "m2m-client-00000000-0000-0000-0000-000000000000"
+              }
+            ],
+            "params": [
+              {
+                "name": "filter",
+                "value": "",
+                "type": "query",
+                "description": "Filter results by field values using the syntax `filter[<field>][<op>]=<value>`.\n\nOperators by field type:\n- **string**: `eq`, `ne`, `in`, `notIn`, `isNull`, `isNotNull`\n- **number**: `eq`, `ne`, `gt`, `gte`, `lt`, `lte`, `in`, `notIn`, `isNull`, `isNotNull`\n- **boolean**: `eq`, `ne`, `isNull`, `isNotNull`\n- **date**: `eq`, `ne`, `gt`, `gte`, `lt`, `lte`, `isNull`, `isNotNull`\n\nFor `in` and `notIn`, provide comma-separated values: `filter[tag_id][in]=a,b,c`.\nFor `isNull` and `isNotNull`, the value is ignored.\n\nMultiple filters are combined with AND.\n\nExamples:\n- `filter[ad_campaign_group_id][eq]=grp_abc123`\n- `filter[ad_campaign_group_name][in]=Brand,Performance`\n- `filter[is_deleted][eq]=false`"
+              }
+            ],
+            "auth": {
+              "type": "bearer",
+              "token": "{{bearerToken}}"
+            }
+          },
+          "docs": "List ad campaign groups"
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "Ad Campaigns",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "List ad campaigns",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "/dimensions/ad-campaigns",
+            "headers": [
+              {
+                "name": "x-client-id",
+                "value": "m2m-client-00000000-0000-0000-0000-000000000000"
+              }
+            ],
+            "params": [
+              {
+                "name": "filter",
+                "value": "",
+                "type": "query",
+                "description": "Filter results by field values using the syntax `filter[<field>][<op>]=<value>`.\n\nOperators by field type:\n- **string**: `eq`, `ne`, `in`, `notIn`, `isNull`, `isNotNull`\n- **number**: `eq`, `ne`, `gt`, `gte`, `lt`, `lte`, `in`, `notIn`, `isNull`, `isNotNull`\n- **boolean**: `eq`, `ne`, `isNull`, `isNotNull`\n- **date**: `eq`, `ne`, `gt`, `gte`, `lt`, `lte`, `isNull`, `isNotNull`\n\nFor `in` and `notIn`, provide comma-separated values: `filter[tag_id][in]=a,b,c`.\nFor `isNull` and `isNotNull`, the value is ignored.\n\nMultiple filters are combined with AND.\n\nExamples:\n- `filter[ad_campaign_id][eq]=cmp_abc123`\n- `filter[ad_campaign_name][in]=Brand Awareness,Retargeting`\n- `filter[is_deleted][eq]=false`"
+              }
+            ],
+            "auth": {
+              "type": "bearer",
+              "token": "{{bearerToken}}"
+            }
+          },
+          "docs": "List ad campaigns"
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "Ad Groups",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "List ad groups",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "/dimensions/ad-groups",
+            "headers": [
+              {
+                "name": "x-client-id",
+                "value": "m2m-client-00000000-0000-0000-0000-000000000000"
+              }
+            ],
+            "params": [
+              {
+                "name": "filter",
+                "value": "",
+                "type": "query",
+                "description": "Filter results by field values using the syntax `filter[<field>][<op>]=<value>`.\n\nOperators by field type:\n- **string**: `eq`, `ne`, `in`, `notIn`, `isNull`, `isNotNull`\n- **number**: `eq`, `ne`, `gt`, `gte`, `lt`, `lte`, `in`, `notIn`, `isNull`, `isNotNull`\n- **boolean**: `eq`, `ne`, `isNull`, `isNotNull`\n- **date**: `eq`, `ne`, `gt`, `gte`, `lt`, `lte`, `isNull`, `isNotNull`\n\nFor `in` and `notIn`, provide comma-separated values: `filter[tag_id][in]=a,b,c`.\nFor `isNull` and `isNotNull`, the value is ignored.\n\nMultiple filters are combined with AND.\n\nExamples:\n- `filter[ad_group_id][eq]=grp_abc123`\n- `filter[ad_group_name][in]=Retargeting,Prospecting`\n- `filter[is_deleted][eq]=false`"
+              }
+            ],
+            "auth": {
+              "type": "bearer",
+              "token": "{{bearerToken}}"
+            }
+          },
+          "docs": "List ad groups"
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "Ad Units",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "List ad units",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "/dimensions/ad-units",
+            "headers": [
+              {
+                "name": "x-client-id",
+                "value": "m2m-client-00000000-0000-0000-0000-000000000000"
+              }
+            ],
+            "params": [
+              {
+                "name": "filter",
+                "value": "",
+                "type": "query",
+                "description": "Filter results by field values using the syntax `filter[<field>][<op>]=<value>`.\n\nOperators by field type:\n- **string**: `eq`, `ne`, `in`, `notIn`, `isNull`, `isNotNull`\n- **number**: `eq`, `ne`, `gt`, `gte`, `lt`, `lte`, `in`, `notIn`, `isNull`, `isNotNull`\n- **boolean**: `eq`, `ne`, `isNull`, `isNotNull`\n- **date**: `eq`, `ne`, `gt`, `gte`, `lt`, `lte`, `isNull`, `isNotNull`\n\nFor `in` and `notIn`, provide comma-separated values: `filter[tag_id][in]=a,b,c`.\nFor `isNull` and `isNotNull`, the value is ignored.\n\nMultiple filters are combined with AND.\n\nExamples:\n- `filter[ad_unit_id][eq]=unt_abc123`\n- `filter[ad_unit_name][in]=Leaderboard,Rectangle`\n- `filter[is_deleted][eq]=false`"
+              }
+            ],
+            "auth": {
+              "type": "bearer",
+              "token": "{{bearerToken}}"
+            }
+          },
+          "docs": "List ad units"
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "Ads",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "List ads",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "/dimensions/ads",
+            "headers": [
+              {
+                "name": "x-client-id",
+                "value": "m2m-client-00000000-0000-0000-0000-000000000000"
+              }
+            ],
+            "params": [
+              {
+                "name": "filter",
+                "value": "",
+                "type": "query",
+                "description": "Filter results by field values using the syntax `filter[<field>][<op>]=<value>`.\n\nOperators by field type:\n- **string**: `eq`, `ne`, `in`, `notIn`, `isNull`, `isNotNull`\n- **number**: `eq`, `ne`, `gt`, `gte`, `lt`, `lte`, `in`, `notIn`, `isNull`, `isNotNull`\n- **boolean**: `eq`, `ne`, `isNull`, `isNotNull`\n- **date**: `eq`, `ne`, `gt`, `gte`, `lt`, `lte`, `isNull`, `isNotNull`\n\nFor `in` and `notIn`, provide comma-separated values: `filter[tag_id][in]=a,b,c`.\nFor `isNull` and `isNotNull`, the value is ignored.\n\nMultiple filters are combined with AND.\n\nExamples:\n- `filter[ad_id][eq]=ad_abc123`\n- `filter[ad_name][in]=Banner A,Video B`\n- `filter[is_deleted][eq]=false`"
+              }
+            ],
+            "auth": {
+              "type": "bearer",
+              "token": "{{bearerToken}}"
+            }
+          },
+          "docs": "List ads"
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "Audiences",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "List audiences",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "/dimensions/audiences",
+            "headers": [
+              {
+                "name": "x-client-id",
+                "value": "m2m-client-00000000-0000-0000-0000-000000000000"
+              }
+            ],
+            "params": [
+              {
+                "name": "filter",
+                "value": "",
+                "type": "query",
+                "description": "Filter results by field values using the syntax `filter[<field>][<op>]=<value>`.\n\nOperators by field type:\n- **string**: `eq`, `ne`, `in`, `notIn`, `isNull`, `isNotNull`\n- **number**: `eq`, `ne`, `gt`, `gte`, `lt`, `lte`, `in`, `notIn`, `isNull`, `isNotNull`\n- **boolean**: `eq`, `ne`, `isNull`, `isNotNull`\n- **date**: `eq`, `ne`, `gt`, `gte`, `lt`, `lte`, `isNull`, `isNotNull`\n\nFor `in` and `notIn`, provide comma-separated values: `filter[tag_id][in]=a,b,c`.\nFor `isNull` and `isNotNull`, the value is ignored.\n\nMultiple filters are combined with AND.\n\nExamples:\n- `filter[audience_id][eq]=aud_abc123`\n- `filter[audience_name][in]=Retargeting,Prospecting`\n- `filter[is_deleted][eq]=false`"
+              }
+            ],
+            "auth": {
+              "type": "bearer",
+              "token": "{{bearerToken}}"
+            }
+          },
+          "docs": "List audiences"
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "Channels",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "List channels",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "/dimensions/channels",
+            "headers": [
+              {
+                "name": "x-client-id",
+                "value": "m2m-client-00000000-0000-0000-0000-000000000000"
+              }
+            ],
+            "params": [
+              {
+                "name": "filter",
+                "value": "",
+                "type": "query",
+                "description": "Filter results by field values using the syntax `filter[<field>][<op>]=<value>`.\n\nOperators by field type:\n- **string**: `eq`, `ne`, `in`, `notIn`, `isNull`, `isNotNull`\n- **number**: `eq`, `ne`, `gt`, `gte`, `lt`, `lte`, `in`, `notIn`, `isNull`, `isNotNull`\n- **boolean**: `eq`, `ne`, `isNull`, `isNotNull`\n- **date**: `eq`, `ne`, `gt`, `gte`, `lt`, `lte`, `isNull`, `isNotNull`\n\nFor `in` and `notIn`, provide comma-separated values: `filter[tag_id][in]=a,b,c`.\nFor `isNull` and `isNotNull`, the value is ignored.\n\nMultiple filters are combined with AND.\n\nExamples:\n- `filter[channel_id][eq]=ch_abc123`\n- `filter[channel_name][in]=Display,Paid Search`"
+              }
+            ],
+            "auth": {
+              "type": "bearer",
+              "token": "{{bearerToken}}"
+            }
+          },
+          "docs": "List channels"
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "Companies",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "List companies",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "/dimensions/companies",
+            "headers": [
+              {
+                "name": "x-client-id",
+                "value": "m2m-client-00000000-0000-0000-0000-000000000000"
+              }
+            ],
+            "params": [
+              {
+                "name": "filter",
+                "value": "",
+                "type": "query",
+                "description": "Filter results by field values using the syntax `filter[<field>][<op>]=<value>`.\n\nOperators by field type:\n- **string**: `eq`, `ne`, `in`, `notIn`, `isNull`, `isNotNull`\n- **number**: `eq`, `ne`, `gt`, `gte`, `lt`, `lte`, `in`, `notIn`, `isNull`, `isNotNull`\n- **boolean**: `eq`, `ne`, `isNull`, `isNotNull`\n- **date**: `eq`, `ne`, `gt`, `gte`, `lt`, `lte`, `isNull`, `isNotNull`\n\nFor `in` and `notIn`, provide comma-separated values: `filter[tag_id][in]=a,b,c`.\nFor `isNull` and `isNotNull`, the value is ignored.\n\nMultiple filters are combined with AND.\n\nExamples:\n- `filter[company_id][eq]=cmp_abc123`\n- `filter[company_name][in]=Acme,Globex`\n- `filter[sector_id][eq]=sec_123`\n- `filter[region_id][eq]=reg_456`\n- `filter[revenue_range_id][eq]=rev_789`"
+              }
+            ],
+            "auth": {
+              "type": "bearer",
+              "token": "{{bearerToken}}"
+            }
+          },
+          "docs": "List companies"
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "IP Lookup",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Get company by IP address",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "/ip/:ipAddress",
+            "headers": [
+              {
+                "name": "x-client-id",
+                "value": "m2m-client-00000000-0000-0000-0000-000000000000"
+              }
+            ],
+            "params": [
+              {
+                "name": "ipAddress",
+                "value": "203.0.113.42",
+                "type": "path",
+                "description": "IPv4 or IPv6 address to look up"
+              }
+            ],
+            "auth": {
+              "type": "bearer",
+              "token": "{{bearerToken}}"
+            }
+          },
+          "docs": "Returns company information associated with the supplied IP address.\n\nCompany fields may be null when the IP address is known but a company relationship could\nnot be determined. A `404` is returned only when no record exists for the IP address. When a `404`\nis returned, our backend systems will automatically begin resolving the IP so that it becomes\navailable soon.\n\nRequires the `ip:read` scope on the Bearer token. A `403` is returned if the scope is absent.\n\n**Rate limiting:** This route has an"
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "Vendors",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "List vendors",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "/dimensions/vendors",
+            "headers": [
+              {
+                "name": "x-client-id",
+                "value": "m2m-client-00000000-0000-0000-0000-000000000000"
+              }
+            ],
+            "params": [
+              {
+                "name": "filter",
+                "value": "",
+                "type": "query",
+                "description": "Filter results by field values using the syntax `filter[<field>][<op>]=<value>`.\n\nOperators by field type:\n- **string**: `eq`, `ne`, `in`, `notIn`, `isNull`, `isNotNull`\n- **number**: `eq`, `ne`, `gt`, `gte`, `lt`, `lte`, `in`, `notIn`, `isNull`, `isNotNull`\n- **boolean**: `eq`, `ne`, `isNull`, `isNotNull`\n- **date**: `eq`, `ne`, `gt`, `gte`, `lt`, `lte`, `isNull`, `isNotNull`\n\nFor `in` and `notIn`, provide comma-separated values: `filter[tag_id][in]=a,b,c`.\nFor `isNull` and `isNotNull`, the value is ignored.\n\nMultiple filters are combined with AND.\n\nExamples:\n- `filter[vendor_id][eq]=vnd_abc123`\n- `filter[vendor_name][in]=Google,LinkedIn`"
+              }
+            ],
+            "auth": {
+              "type": "bearer",
+              "token": "{{bearerToken}}"
+            }
+          },
+          "docs": "List vendors"
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}
