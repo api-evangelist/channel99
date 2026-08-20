@@ -48,6 +48,22 @@ tags:
 - Advertising
 - Marketing Technology
 - Artificial Intelligence
+- Account Based Marketing
+- Reporting
+- MCP
+- Agent Ready
+- Intent Data
+- Account Identification
+- Data Export
+tags_raw:
+- Company
+- Marketing
+- Analytics
+- Attribution
+- B2B
+- Advertising
+- Marketing Technology
+- Artificial Intelligence
 - Account-Based Marketing
 - Reporting
 - MCP
@@ -68,6 +84,14 @@ apis:
   humanURL: https://support.channel99.com/hc/en-us/articles/49766041989787-Channel99-Reporting-API-Developer-Guide
   baseURL: https://pulsar.channel99.com
   tags:
+  - Reporting
+  - Marketing Attribution
+  - b2b-analytics
+  - Ad Verification
+  - Intent Data
+  - Account Identification
+  - Data Export
+  tags_raw:
   - reporting
   - marketing-attribution
   - b2b-analytics
@@ -108,6 +132,12 @@ apis:
   humanURL: https://support.channel99.com/hc/en-us/articles/46757387781275-Channel99-MCP-Server-Information
   baseURL: https://mcp.channel99.com
   tags:
+  - MCP
+  - agent-native
+  - Marketing Intelligence
+  - llm-connector
+  - Authentication
+  tags_raw:
   - mcp
   - agent-native
   - marketing-intelligence
