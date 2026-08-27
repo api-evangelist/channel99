@@ -72,64 +72,16 @@ tags_raw:
 - Account Identification
 - Data Export
 apis:
-- name: Channel99 Pulsar Reporting API
-  description: >-
-    Channel99's Bulk Data Transfer REST API. Seventeen operations giving programmatic access to
-    the account-resolved marketing facts behind the platform - website visits, pageviews, ad
-    impressions and buyer-intent signals - plus the ad, audience, company, channel and vendor
-    dimensions needed to join them, and a separately-permissioned IP-to-company resolution route.
-    Authentication is an M2M client_credentials exchange returning a one-hour Stytch-issued JWT
-    that must be paired with a matching x-client-id header. Lists are cursor-paginated (limit
-    default 200, maximum 1000) with a deepObject filter[field][op] syntax and single-field sort.
-  humanURL: https://support.channel99.com/hc/en-us/articles/49766041989787-Channel99-Reporting-API-Developer-Guide
-  baseURL: https://pulsar.channel99.com
-  tags:
-  - Reporting
-  - Marketing Attribution
-  - b2b-analytics
-  - Ad Verification
-  - Intent Data
-  - Account Identification
-  - Data Export
-  tags_raw:
-  - reporting
-  - marketing-attribution
-  - b2b-analytics
-  - ad-verification
-  - intent-data
-  - account-identification
-  - data-export
-  properties:
-  - type: OpenAPI
-    url: openapi/channel99-pulsar-openapi.json
-  - type: Documentation
-    url: https://support.channel99.com/hc/en-us/articles/49766041989787-Channel99-Reporting-API-Developer-Guide
-  - type: APIReference
-    url: https://pulsar.channel99.com/docs/#/
-  - type: Overlay
-    url: overlays/channel99-pulsar-overlay.yaml
-  - type: Authentication
-    url: authentication/channel99-authentication.yml
-  - type: Conventions
-    url: conventions/channel99-conventions.yml
-  - type: DataModel
-    url: data-model/channel99-data-model.yml
-  - type: ErrorCatalog
-    url: errors/channel99-problem-types.yml
-  - type: RateLimits
-    url: rate-limits/channel99-rate-limits.yml
-  - type: AgentSkill
-    url: skills/_index.yml
 - name: Channel99 MCP Server
   description: >-
-    First-party remote Model Context Protocol server that exposes Channel99 marketing
-    intelligence - visits, pixel impressions, vendor and channel scores, audiences, account
-    identity and pipeline influence - to an external LLM under read-only controls, including a
-    guarded SQL-backed data interface. OAuth 2.1 with PKCE against a Stytch authorization server
-    on a Channel99 subdomain, with RFC 9728 protected-resource and RFC 8414 authorization-server
-    metadata both published. Channel99 ships connectors for OpenAI ChatGPT (GA) and Anthropic
-    Claude (beta). Tool schemas require an authenticated tools/list.
-  humanURL: https://support.channel99.com/hc/en-us/articles/46757387781275-Channel99-MCP-Server-Information
+    First-party remote Model Context Protocol server that exposes Channel99 marketing intelligence - visits,
+    pixel impressions, vendor and channel scores, audiences, account identity and pipeline influence -
+    to an external LLM under read-only controls, including a guarded SQL-backed data interface. OAuth
+    2.1 with PKCE against a Stytch authorization server on a Channel99 subdomain, with RFC 9728 protected-resource
+    and RFC 8414 authorization-server metadata both published. Channel99 ships connectors for OpenAI ChatGPT
+    (GA) and Anthropic Claude (beta). Tool schemas require an authenticated tools/list.
+  humanURL: >-
+    https://support.channel99.com/hc/en-us/articles/46757387781275-Channel99-MCP-Server-Information
   baseURL: https://mcp.channel99.com
   tags:
   - MCP
@@ -154,6 +106,448 @@ apis:
     url: well-known/channel99-well-known.yml
   - type: OAuthScopes
     url: scopes/channel99-scopes.yml
+- aid: channel99:channel99-ad-accounts-api
+  name: Channel99 Ad Accounts API
+  description: Ad account dimension records — `GET /dimensions/ad-accounts`
+  humanURL: >-
+    https://support.channel99.com/hc/en-us/articles/49766041989787-Channel99-Reporting-API-Developer-Guide
+  baseURL: https://pulsar.channel99.com
+  tags:
+  - Ad Accounts
+  properties:
+  - type: OpenAPI
+    url: openapi/channel99-ad-accounts-api-openapi.yml
+  - type: Documentation
+    url: >-
+      https://support.channel99.com/hc/en-us/articles/49766041989787-Channel99-Reporting-API-Developer-Guide
+  - type: APIReference
+    url: https://pulsar.channel99.com/docs/#/
+  - type: Authentication
+    url: authentication/channel99-authentication.yml
+  - type: Conventions
+    url: conventions/channel99-conventions.yml
+  - type: DataModel
+    url: data-model/channel99-data-model.yml
+  - type: ErrorCatalog
+    url: errors/channel99-problem-types.yml
+  - type: RateLimits
+    url: rate-limits/channel99-rate-limits.yml
+- aid: channel99:channel99-ad-campaign-groups-api
+  name: Channel99 Ad Campaign Groups API
+  description: Ad campaign group dimension records — `GET /dimensions/ad-campaign-groups`
+  humanURL: >-
+    https://support.channel99.com/hc/en-us/articles/49766041989787-Channel99-Reporting-API-Developer-Guide
+  baseURL: https://pulsar.channel99.com
+  tags:
+  - Ad Campaign Groups
+  properties:
+  - type: OpenAPI
+    url: openapi/channel99-ad-campaign-groups-api-openapi.yml
+  - type: Documentation
+    url: >-
+      https://support.channel99.com/hc/en-us/articles/49766041989787-Channel99-Reporting-API-Developer-Guide
+  - type: APIReference
+    url: https://pulsar.channel99.com/docs/#/
+  - type: Authentication
+    url: authentication/channel99-authentication.yml
+  - type: Conventions
+    url: conventions/channel99-conventions.yml
+  - type: DataModel
+    url: data-model/channel99-data-model.yml
+  - type: ErrorCatalog
+    url: errors/channel99-problem-types.yml
+  - type: RateLimits
+    url: rate-limits/channel99-rate-limits.yml
+- aid: channel99:channel99-ad-campaigns-api
+  name: Channel99 Ad Campaigns API
+  description: Ad campaign dimension records — `GET /dimensions/ad-campaigns`
+  humanURL: >-
+    https://support.channel99.com/hc/en-us/articles/49766041989787-Channel99-Reporting-API-Developer-Guide
+  baseURL: https://pulsar.channel99.com
+  tags:
+  - Ad Campaigns
+  properties:
+  - type: OpenAPI
+    url: openapi/channel99-ad-campaigns-api-openapi.yml
+  - type: Documentation
+    url: >-
+      https://support.channel99.com/hc/en-us/articles/49766041989787-Channel99-Reporting-API-Developer-Guide
+  - type: APIReference
+    url: https://pulsar.channel99.com/docs/#/
+  - type: Authentication
+    url: authentication/channel99-authentication.yml
+  - type: Conventions
+    url: conventions/channel99-conventions.yml
+  - type: DataModel
+    url: data-model/channel99-data-model.yml
+  - type: ErrorCatalog
+    url: errors/channel99-problem-types.yml
+  - type: RateLimits
+    url: rate-limits/channel99-rate-limits.yml
+- aid: channel99:channel99-ad-groups-api
+  name: Channel99 Ad Groups API
+  description: Ad group dimension records — `GET /dimensions/ad-groups`
+  humanURL: >-
+    https://support.channel99.com/hc/en-us/articles/49766041989787-Channel99-Reporting-API-Developer-Guide
+  baseURL: https://pulsar.channel99.com
+  tags:
+  - Ad Groups
+  properties:
+  - type: OpenAPI
+    url: openapi/channel99-ad-groups-api-openapi.yml
+  - type: Documentation
+    url: >-
+      https://support.channel99.com/hc/en-us/articles/49766041989787-Channel99-Reporting-API-Developer-Guide
+  - type: APIReference
+    url: https://pulsar.channel99.com/docs/#/
+  - type: Authentication
+    url: authentication/channel99-authentication.yml
+  - type: Conventions
+    url: conventions/channel99-conventions.yml
+  - type: DataModel
+    url: data-model/channel99-data-model.yml
+  - type: ErrorCatalog
+    url: errors/channel99-problem-types.yml
+  - type: RateLimits
+    url: rate-limits/channel99-rate-limits.yml
+- aid: channel99:channel99-ad-units-api
+  name: Channel99 Ad Units API
+  description: Ad unit dimension records — `GET /dimensions/ad-units`
+  humanURL: >-
+    https://support.channel99.com/hc/en-us/articles/49766041989787-Channel99-Reporting-API-Developer-Guide
+  baseURL: https://pulsar.channel99.com
+  tags:
+  - Ad Units
+  properties:
+  - type: OpenAPI
+    url: openapi/channel99-ad-units-api-openapi.yml
+  - type: Documentation
+    url: >-
+      https://support.channel99.com/hc/en-us/articles/49766041989787-Channel99-Reporting-API-Developer-Guide
+  - type: APIReference
+    url: https://pulsar.channel99.com/docs/#/
+  - type: Authentication
+    url: authentication/channel99-authentication.yml
+  - type: Conventions
+    url: conventions/channel99-conventions.yml
+  - type: DataModel
+    url: data-model/channel99-data-model.yml
+  - type: ErrorCatalog
+    url: errors/channel99-problem-types.yml
+  - type: RateLimits
+    url: rate-limits/channel99-rate-limits.yml
+- aid: channel99:channel99-ads-api
+  name: Channel99 Ads API
+  description: Ad dimension records — `GET /dimensions/ads`
+  humanURL: >-
+    https://support.channel99.com/hc/en-us/articles/49766041989787-Channel99-Reporting-API-Developer-Guide
+  baseURL: https://pulsar.channel99.com
+  tags:
+  - Ads
+  properties:
+  - type: OpenAPI
+    url: openapi/channel99-ads-api-openapi.yml
+  - type: Documentation
+    url: >-
+      https://support.channel99.com/hc/en-us/articles/49766041989787-Channel99-Reporting-API-Developer-Guide
+  - type: APIReference
+    url: https://pulsar.channel99.com/docs/#/
+  - type: Authentication
+    url: authentication/channel99-authentication.yml
+  - type: Conventions
+    url: conventions/channel99-conventions.yml
+  - type: DataModel
+    url: data-model/channel99-data-model.yml
+  - type: ErrorCatalog
+    url: errors/channel99-problem-types.yml
+  - type: RateLimits
+    url: rate-limits/channel99-rate-limits.yml
+- aid: channel99:channel99-audiences-api
+  name: Channel99 Audiences API
+  description: Audience dimension records — `GET /dimensions/audiences`
+  humanURL: >-
+    https://support.channel99.com/hc/en-us/articles/49766041989787-Channel99-Reporting-API-Developer-Guide
+  baseURL: https://pulsar.channel99.com
+  tags:
+  - Audiences
+  properties:
+  - type: OpenAPI
+    url: openapi/channel99-audiences-api-openapi.yml
+  - type: Documentation
+    url: >-
+      https://support.channel99.com/hc/en-us/articles/49766041989787-Channel99-Reporting-API-Developer-Guide
+  - type: APIReference
+    url: https://pulsar.channel99.com/docs/#/
+  - type: Authentication
+    url: authentication/channel99-authentication.yml
+  - type: Conventions
+    url: conventions/channel99-conventions.yml
+  - type: DataModel
+    url: data-model/channel99-data-model.yml
+  - type: ErrorCatalog
+    url: errors/channel99-problem-types.yml
+  - type: RateLimits
+    url: rate-limits/channel99-rate-limits.yml
+- aid: channel99:channel99-auth-api
+  name: Channel99 Auth API
+  description: Token issuance — `POST /auth/token`
+  humanURL: >-
+    https://support.channel99.com/hc/en-us/articles/49766041989787-Channel99-Reporting-API-Developer-Guide
+  baseURL: https://pulsar.channel99.com
+  tags:
+  - Auth
+  properties:
+  - type: OpenAPI
+    url: openapi/channel99-auth-api-openapi.yml
+  - type: Documentation
+    url: >-
+      https://support.channel99.com/hc/en-us/articles/49766041989787-Channel99-Reporting-API-Developer-Guide
+  - type: APIReference
+    url: https://pulsar.channel99.com/docs/#/
+  - type: Authentication
+    url: authentication/channel99-authentication.yml
+  - type: Conventions
+    url: conventions/channel99-conventions.yml
+  - type: DataModel
+    url: data-model/channel99-data-model.yml
+  - type: ErrorCatalog
+    url: errors/channel99-problem-types.yml
+  - type: RateLimits
+    url: rate-limits/channel99-rate-limits.yml
+- aid: channel99:channel99-channels-api
+  name: Channel99 Channels API
+  description: Channel dimension records — `GET /dimensions/channels`
+  humanURL: >-
+    https://support.channel99.com/hc/en-us/articles/49766041989787-Channel99-Reporting-API-Developer-Guide
+  baseURL: https://pulsar.channel99.com
+  tags:
+  - Channels
+  properties:
+  - type: OpenAPI
+    url: openapi/channel99-channels-api-openapi.yml
+  - type: Documentation
+    url: >-
+      https://support.channel99.com/hc/en-us/articles/49766041989787-Channel99-Reporting-API-Developer-Guide
+  - type: APIReference
+    url: https://pulsar.channel99.com/docs/#/
+  - type: Authentication
+    url: authentication/channel99-authentication.yml
+  - type: Conventions
+    url: conventions/channel99-conventions.yml
+  - type: DataModel
+    url: data-model/channel99-data-model.yml
+  - type: ErrorCatalog
+    url: errors/channel99-problem-types.yml
+  - type: RateLimits
+    url: rate-limits/channel99-rate-limits.yml
+- aid: channel99:channel99-companies-api
+  name: Channel99 Companies API
+  description: Company dimension records — `GET /dimensions/companies`
+  humanURL: >-
+    https://support.channel99.com/hc/en-us/articles/49766041989787-Channel99-Reporting-API-Developer-Guide
+  baseURL: https://pulsar.channel99.com
+  tags:
+  - Companies
+  properties:
+  - type: OpenAPI
+    url: openapi/channel99-companies-api-openapi.yml
+  - type: Documentation
+    url: >-
+      https://support.channel99.com/hc/en-us/articles/49766041989787-Channel99-Reporting-API-Developer-Guide
+  - type: APIReference
+    url: https://pulsar.channel99.com/docs/#/
+  - type: Authentication
+    url: authentication/channel99-authentication.yml
+  - type: Conventions
+    url: conventions/channel99-conventions.yml
+  - type: DataModel
+    url: data-model/channel99-data-model.yml
+  - type: ErrorCatalog
+    url: errors/channel99-problem-types.yml
+  - type: RateLimits
+    url: rate-limits/channel99-rate-limits.yml
+- aid: channel99:channel99-health-api
+  name: Channel99 Health API
+  description: Service health check
+  humanURL: >-
+    https://support.channel99.com/hc/en-us/articles/49766041989787-Channel99-Reporting-API-Developer-Guide
+  baseURL: https://pulsar.channel99.com
+  tags:
+  - Health
+  properties:
+  - type: OpenAPI
+    url: openapi/channel99-health-api-openapi.yml
+  - type: Documentation
+    url: >-
+      https://support.channel99.com/hc/en-us/articles/49766041989787-Channel99-Reporting-API-Developer-Guide
+  - type: APIReference
+    url: https://pulsar.channel99.com/docs/#/
+  - type: Authentication
+    url: authentication/channel99-authentication.yml
+  - type: Conventions
+    url: conventions/channel99-conventions.yml
+  - type: DataModel
+    url: data-model/channel99-data-model.yml
+  - type: ErrorCatalog
+    url: errors/channel99-problem-types.yml
+  - type: RateLimits
+    url: rate-limits/channel99-rate-limits.yml
+- aid: channel99:channel99-impressions-api
+  name: Channel99 Impressions API
+  description: Ad impression events — `GET /events/impressions`
+  humanURL: >-
+    https://support.channel99.com/hc/en-us/articles/49766041989787-Channel99-Reporting-API-Developer-Guide
+  baseURL: https://pulsar.channel99.com
+  tags:
+  - Impressions
+  properties:
+  - type: OpenAPI
+    url: openapi/channel99-impressions-api-openapi.yml
+  - type: Documentation
+    url: >-
+      https://support.channel99.com/hc/en-us/articles/49766041989787-Channel99-Reporting-API-Developer-Guide
+  - type: APIReference
+    url: https://pulsar.channel99.com/docs/#/
+  - type: Authentication
+    url: authentication/channel99-authentication.yml
+  - type: Conventions
+    url: conventions/channel99-conventions.yml
+  - type: DataModel
+    url: data-model/channel99-data-model.yml
+  - type: ErrorCatalog
+    url: errors/channel99-problem-types.yml
+  - type: RateLimits
+    url: rate-limits/channel99-rate-limits.yml
+- aid: channel99:channel99-intents-api
+  name: Channel99 Intents API
+  description: Buyer intent signal events — `GET /events/intents`
+  humanURL: >-
+    https://support.channel99.com/hc/en-us/articles/49766041989787-Channel99-Reporting-API-Developer-Guide
+  baseURL: https://pulsar.channel99.com
+  tags:
+  - Intents
+  properties:
+  - type: OpenAPI
+    url: openapi/channel99-intents-api-openapi.yml
+  - type: Documentation
+    url: >-
+      https://support.channel99.com/hc/en-us/articles/49766041989787-Channel99-Reporting-API-Developer-Guide
+  - type: APIReference
+    url: https://pulsar.channel99.com/docs/#/
+  - type: Authentication
+    url: authentication/channel99-authentication.yml
+  - type: Conventions
+    url: conventions/channel99-conventions.yml
+  - type: DataModel
+    url: data-model/channel99-data-model.yml
+  - type: ErrorCatalog
+    url: errors/channel99-problem-types.yml
+  - type: RateLimits
+    url: rate-limits/channel99-rate-limits.yml
+- aid: channel99:channel99-ip-lookup-api
+  name: Channel99 IP Lookup API
+  description: Company information lookup by IP address — `GET /ip/{ipAddress}`
+  humanURL: >-
+    https://support.channel99.com/hc/en-us/articles/49766041989787-Channel99-Reporting-API-Developer-Guide
+  baseURL: https://pulsar.channel99.com
+  tags:
+  - IP Lookup
+  properties:
+  - type: OpenAPI
+    url: openapi/channel99-ip-lookup-api-openapi.yml
+  - type: Documentation
+    url: >-
+      https://support.channel99.com/hc/en-us/articles/49766041989787-Channel99-Reporting-API-Developer-Guide
+  - type: APIReference
+    url: https://pulsar.channel99.com/docs/#/
+  - type: Authentication
+    url: authentication/channel99-authentication.yml
+  - type: Conventions
+    url: conventions/channel99-conventions.yml
+  - type: DataModel
+    url: data-model/channel99-data-model.yml
+  - type: ErrorCatalog
+    url: errors/channel99-problem-types.yml
+  - type: RateLimits
+    url: rate-limits/channel99-rate-limits.yml
+- aid: channel99:channel99-pageviews-api
+  name: Channel99 Pageviews API
+  description: Website pageview events — `GET /events/pageviews`
+  humanURL: >-
+    https://support.channel99.com/hc/en-us/articles/49766041989787-Channel99-Reporting-API-Developer-Guide
+  baseURL: https://pulsar.channel99.com
+  tags:
+  - Pageviews
+  properties:
+  - type: OpenAPI
+    url: openapi/channel99-pageviews-api-openapi.yml
+  - type: Documentation
+    url: >-
+      https://support.channel99.com/hc/en-us/articles/49766041989787-Channel99-Reporting-API-Developer-Guide
+  - type: APIReference
+    url: https://pulsar.channel99.com/docs/#/
+  - type: Authentication
+    url: authentication/channel99-authentication.yml
+  - type: Conventions
+    url: conventions/channel99-conventions.yml
+  - type: DataModel
+    url: data-model/channel99-data-model.yml
+  - type: ErrorCatalog
+    url: errors/channel99-problem-types.yml
+  - type: RateLimits
+    url: rate-limits/channel99-rate-limits.yml
+- aid: channel99:channel99-vendors-api
+  name: Channel99 Vendors API
+  description: Vendor dimension records — `GET /dimensions/vendors`
+  humanURL: >-
+    https://support.channel99.com/hc/en-us/articles/49766041989787-Channel99-Reporting-API-Developer-Guide
+  baseURL: https://pulsar.channel99.com
+  tags:
+  - Vendors
+  properties:
+  - type: OpenAPI
+    url: openapi/channel99-vendors-api-openapi.yml
+  - type: Documentation
+    url: >-
+      https://support.channel99.com/hc/en-us/articles/49766041989787-Channel99-Reporting-API-Developer-Guide
+  - type: APIReference
+    url: https://pulsar.channel99.com/docs/#/
+  - type: Authentication
+    url: authentication/channel99-authentication.yml
+  - type: Conventions
+    url: conventions/channel99-conventions.yml
+  - type: DataModel
+    url: data-model/channel99-data-model.yml
+  - type: ErrorCatalog
+    url: errors/channel99-problem-types.yml
+  - type: RateLimits
+    url: rate-limits/channel99-rate-limits.yml
+- aid: channel99:channel99-visits-api
+  name: Channel99 Visits API
+  description: Website visit events — `GET /events/visits`
+  humanURL: >-
+    https://support.channel99.com/hc/en-us/articles/49766041989787-Channel99-Reporting-API-Developer-Guide
+  baseURL: https://pulsar.channel99.com
+  tags:
+  - Visits
+  properties:
+  - type: OpenAPI
+    url: openapi/channel99-visits-api-openapi.yml
+  - type: Documentation
+    url: >-
+      https://support.channel99.com/hc/en-us/articles/49766041989787-Channel99-Reporting-API-Developer-Guide
+  - type: APIReference
+    url: https://pulsar.channel99.com/docs/#/
+  - type: Authentication
+    url: authentication/channel99-authentication.yml
+  - type: Conventions
+    url: conventions/channel99-conventions.yml
+  - type: DataModel
+    url: data-model/channel99-data-model.yml
+  - type: ErrorCatalog
+    url: errors/channel99-problem-types.yml
+  - type: RateLimits
+    url: rate-limits/channel99-rate-limits.yml
 maintainers:
 - FN: Kin Lane
   email: kin@apievangelist.com
