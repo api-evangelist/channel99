@@ -12,6 +12,18 @@ description: 'Channel99 is a B2B marketing performance and attribution platform 
   Norwest Venture Partners, Jackson Square Ventures, Industry Ventures, Ridge Ventures, Geek Ventures,
   and Marin-Sonoma Impact Ventures.'
 url: https://raw.githubusercontent.com/api-evangelist/channel99/refs/heads/main/apis.yml
+deliveryModel:
+  model: saas
+  open_source: false
+  commercial: true
+  callable_host: false
+  label: Hosted service · you call their endpoint
+  confidence: medium
+  source:
+  - openapi
+  - pricing
+  generated: '2026-08-28'
+  method: derived
 accessModel:
   pricing: contact-sales
   onboarding: sales-assisted
