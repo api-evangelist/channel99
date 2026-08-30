@@ -60,7 +60,7 @@ tags:
 - Advertising
 - Marketing Technology
 - Artificial Intelligence
-- Account Based Marketing
+- Account-Based Marketing
 - Reporting
 - MCP
 - Agent Ready
@@ -98,7 +98,7 @@ apis:
   tags:
   - MCP
   - agent-native
-  - Marketing Intelligence
+  - marketing-intelligence
   - llm-connector
   - Authentication
   tags_raw:
@@ -307,6 +307,8 @@ apis:
     https://support.channel99.com/hc/en-us/articles/49766041989787-Channel99-Reporting-API-Developer-Guide
   baseURL: https://pulsar.channel99.com
   tags:
+  - Authentication
+  tags_raw:
   - Auth
   properties:
   - type: OpenAPI
@@ -489,6 +491,8 @@ apis:
     https://support.channel99.com/hc/en-us/articles/49766041989787-Channel99-Reporting-API-Developer-Guide
   baseURL: https://pulsar.channel99.com
   tags:
+  - Page Views
+  tags_raw:
   - Pageviews
   properties:
   - type: OpenAPI
