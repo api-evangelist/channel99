@@ -1,0 +1,197 @@
+openapi: 3.2.0
+info:
+  title: Pulsar IP Lookup API
+  description: Channel99 Bulk Data Transfer REST API
+  version: 1.0.0
+servers:
+- url: /
+tags:
+- name: IP Lookup
+  description: Company information lookup by IP address — `GET /ip/{ipAddress}`
+paths:
+  /ip/{ipAddress}:
+    get:
+      tags:
+      - IP Lookup
+      summary: Get company by IP address
+      operationId: getCompanyByIp
+      description: 'Returns company information associated with the supplied IP address.
+
+
+        Company fields may be null when the IP address is known but a company relationship could
+
+        not be determined. A `404` is returned only when no record exists for the IP address. When a `404`
+
+        is returned, our backend systems will automatically begin resolving the IP so that it becomes
+
+        available soon.
+
+
+        Requires the `ip:read` scope on the Bearer token. A `403` is returned if the scope is absent.
+
+
+        **Rate limiting:** This route has an elevated WAF per-client rate limit of 1,000 req/s
+
+        (vs. 60 req/s for all other routes) and is exempt from the app-level data burst limit.
+
+        A `429` is returned with a `Retry-After` header if a limit is exceeded.'
+      security:
+      - bearerAuth: []
+        clientId: []
+      parameters:
+      - name: x-client-id
+        in: header
+        required: true
+        schema:
+          type: string
+        description: Client identifier matching the authenticated token
+        example: m2m-client-00000000-0000-0000-0000-000000000000
+      - name: ipAddress
+        in: path
+        required: true
+        schema:
+          type: string
+        description: IPv4 or IPv6 address to look up
+        example: 203.0.113.42
+      responses:
+        '200':
+          description: Company record for the given IP address. Company fields may be null when the IP address is known but a company relationship could not be determined.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/IpCompanyRecord'
+                required:
+                - data
+        '401':
+          description: Unauthorized – missing or malformed credentials
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Forbidden – invalid token, client mismatch, or missing `ip:read` scope
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+components:
+  responses:
+    TooManyRequests:
+      description: 'Rate limit exceeded – too many requests from this client.
+
+
+        Limits:
+
+        - `POST /auth/token`: 20 req/min per `client_id` (app), plus WAF per-IP limit
+
+        - `/events/*` and `/dimensions/*`: burst limit of 100 req / 10s per client (app)
+
+        - All authenticated routes: WAF 60 req/s per `x-client-id` (5-minute window)
+
+        - `/ip/*` routes: WAF elevated tier (app burst limit does not apply)
+
+
+        App-level limits can be disabled via `PULSAR_APP_RATE_LIMITS=0|false|off` (WAF still applies).'
+      headers:
+        Retry-After:
+          description: Number of seconds to wait before retrying
+          schema:
+            type: integer
+            example: 60
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    NotFound:
+      description: Not found – no matching route or resource (code `err:pulsar.core.not-found`)
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+  schemas:
+    IpCompanyRecord:
+      type: object
+      description: Company information associated with an IP address. Company fields may be null when the IP address is known but a company relationship could not be determined.
+      properties:
+        ip_address:
+          type: string
+          example: 203.0.113.42
+        company_domain:
+          type:
+          - string
+          - 'null'
+          example: acme.com
+          description: Null when the company relationship for this IP could not be resolved.
+        company_name:
+          type:
+          - string
+          - 'null'
+          example: Acme Corp
+          description: Null when the company relationship for this IP could not be resolved.
+        region_name:
+          type:
+          - string
+          - 'null'
+          example: North America
+          description: Null when the company relationship for this IP could not be resolved.
+        rev_range_name:
+          type:
+          - string
+          - 'null'
+          example: $100M–$500M
+          description: Null when the company relationship for this IP could not be resolved.
+        sector_name:
+          type:
+          - string
+          - 'null'
+          example: Technology
+          description: Null when the company relationship for this IP could not be resolved.
+      required:
+      - ip_address
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Error class name
+        code:
+          type: string
+          description: Machine-readable error code (e.g. `err:pulsar.request.invalid-limit`, `err:pulsar.core.not-found`)
+          example: err:pulsar.request.invalid-limit
+        message:
+          type: string
+          description: Human-readable description
+      required:
+      - error
+      - code
+      - message
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: 'M2M Bearer token issued by Stytch. Pass as `Authorization: Bearer <token>`.
+
+
+        Example: `Authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...`'
+    clientId:
+      type: apiKey
+      in: header
+      name: x-client-id
+      description: 'Client identifier that must match the `client_id` claim in the Bearer token.
+
+
+        Example: `x-client-id: m2m-client-00000000-0000-0000-0000-000000000000`'

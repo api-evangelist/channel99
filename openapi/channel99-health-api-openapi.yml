@@ -1,0 +1,73 @@
+openapi: 3.2.0
+info:
+  title: Pulsar Health API
+  description: Channel99 Bulk Data Transfer REST API
+  version: 1.0.0
+servers:
+- url: /
+tags:
+- name: Health
+  description: Service health check
+paths:
+  /health:
+    get:
+      tags:
+      - Health
+      summary: Health check
+      operationId: getHealth
+      responses:
+        '200':
+          description: Service is healthy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: ok
+        '404':
+          $ref: '#/components/responses/NotFound'
+components:
+  schemas:
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Error class name
+        code:
+          type: string
+          description: Machine-readable error code (e.g. `err:pulsar.request.invalid-limit`, `err:pulsar.core.not-found`)
+          example: err:pulsar.request.invalid-limit
+        message:
+          type: string
+          description: Human-readable description
+      required:
+      - error
+      - code
+      - message
+  responses:
+    NotFound:
+      description: Not found – no matching route or resource (code `err:pulsar.core.not-found`)
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: 'M2M Bearer token issued by Stytch. Pass as `Authorization: Bearer <token>`.
+
+
+        Example: `Authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...`'
+    clientId:
+      type: apiKey
+      in: header
+      name: x-client-id
+      description: 'Client identifier that must match the `client_id` claim in the Bearer token.
+
+
+        Example: `x-client-id: m2m-client-00000000-0000-0000-0000-000000000000`'

@@ -1,0 +1,140 @@
+openapi: 3.2.0
+info:
+  title: Pulsar Auth API
+  description: Channel99 Bulk Data Transfer REST API
+  version: 1.0.0
+servers:
+- url: /
+tags:
+- name: Auth
+  description: Token issuance — `POST /auth/token`
+paths:
+  /auth/token:
+    post:
+      tags:
+      - Auth
+      summary: Issue access token
+      description: Exchange an M2M client ID and secret for a bearer access token. This endpoint does not require authentication.
+      operationId: postAuthToken
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - client_id
+              - client_secret
+              properties:
+                client_id:
+                  type: string
+                  description: The M2M client identifier
+                  example: m2m-client-00000000-0000-0000-0000-000000000000
+                client_secret:
+                  type: string
+                  description: The M2M client secret
+                  example: ••••••••
+      responses:
+        '200':
+          description: Access token issued successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - access_token
+                - token_type
+                - expires_in
+                properties:
+                  access_token:
+                    type: string
+                    description: Bearer token to use in subsequent requests
+                  token_type:
+                    type: string
+                    enum:
+                    - bearer
+                  expires_in:
+                    type: integer
+                    description: Token lifetime in seconds
+                    example: 3600
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+components:
+  responses:
+    Unauthorized:
+      description: Unauthorized – invalid client_id or client_secret (code `err:pulsar.auth.invalid-credentials`)
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    BadRequest:
+      description: Bad request – missing client_id or client_secret (code `err:pulsar.auth.missing-credentials`)
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    TooManyRequests:
+      description: 'Rate limit exceeded – too many requests from this client.
+
+
+        Limits:
+
+        - `POST /auth/token`: 20 req/min per `client_id` (app), plus WAF per-IP limit
+
+        - `/events/*` and `/dimensions/*`: burst limit of 100 req / 10s per client (app)
+
+        - All authenticated routes: WAF 60 req/s per `x-client-id` (5-minute window)
+
+        - `/ip/*` routes: WAF elevated tier (app burst limit does not apply)
+
+
+        App-level limits can be disabled via `PULSAR_APP_RATE_LIMITS=0|false|off` (WAF still applies).'
+      headers:
+        Retry-After:
+          description: Number of seconds to wait before retrying
+          schema:
+            type: integer
+            example: 60
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+  schemas:
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Error class name
+        code:
+          type: string
+          description: Machine-readable error code (e.g. `err:pulsar.request.invalid-limit`, `err:pulsar.core.not-found`)
+          example: err:pulsar.request.invalid-limit
+        message:
+          type: string
+          description: Human-readable description
+      required:
+      - error
+      - code
+      - message
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: 'M2M Bearer token issued by Stytch. Pass as `Authorization: Bearer <token>`.
+
+
+        Example: `Authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...`'
+    clientId:
+      type: apiKey
+      in: header
+      name: x-client-id
+      description: 'Client identifier that must match the `client_id` claim in the Bearer token.
+
+
+        Example: `x-client-id: m2m-client-00000000-0000-0000-0000-000000000000`'

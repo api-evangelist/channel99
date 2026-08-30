@@ -1,0 +1,193 @@
+openapi: 3.2.0
+info:
+  title: Pulsar Ad Accounts API
+  description: Channel99 Bulk Data Transfer REST API
+  version: 1.0.0
+servers:
+- url: /
+tags:
+- name: Ad Accounts
+  description: Ad account dimension records — `GET /dimensions/ad-accounts`
+paths:
+  /dimensions/ad-accounts:
+    get:
+      tags:
+      - Ad Accounts
+      summary: List ad accounts
+      operationId: getAdAccounts
+      security:
+      - bearerAuth: []
+        clientId: []
+      parameters:
+      - name: x-client-id
+        in: header
+        required: true
+        schema:
+          type: string
+        description: Client identifier matching the authenticated token
+        example: m2m-client-00000000-0000-0000-0000-000000000000
+      - $ref: '#/components/parameters/filterAdAccounts'
+      responses:
+        '200':
+          description: All ad account records
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdAccountList'
+        '400':
+          description: Bad request – missing instance or invalid filter
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized – missing or malformed credentials
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Forbidden – invalid token or client mismatch
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+components:
+  responses:
+    TooManyRequests:
+      description: 'Rate limit exceeded – too many requests from this client.
+
+
+        Limits:
+
+        - `POST /auth/token`: 20 req/min per `client_id` (app), plus WAF per-IP limit
+
+        - `/events/*` and `/dimensions/*`: burst limit of 100 req / 10s per client (app)
+
+        - All authenticated routes: WAF 60 req/s per `x-client-id` (5-minute window)
+
+        - `/ip/*` routes: WAF elevated tier (app burst limit does not apply)
+
+
+        App-level limits can be disabled via `PULSAR_APP_RATE_LIMITS=0|false|off` (WAF still applies).'
+      headers:
+        Retry-After:
+          description: Number of seconds to wait before retrying
+          schema:
+            type: integer
+            example: 60
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    NotFound:
+      description: Not found – no matching route or resource (code `err:pulsar.core.not-found`)
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+  schemas:
+    AdAccount:
+      type: object
+      properties:
+        ad_account_id:
+          type: string
+        ad_account_name:
+          type: string
+        is_deleted:
+          type: boolean
+      required:
+      - ad_account_id
+      - ad_account_name
+      - is_deleted
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Error class name
+        code:
+          type: string
+          description: Machine-readable error code (e.g. `err:pulsar.request.invalid-limit`, `err:pulsar.core.not-found`)
+          example: err:pulsar.request.invalid-limit
+        message:
+          type: string
+          description: Human-readable description
+      required:
+      - error
+      - code
+      - message
+    AdAccountList:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/AdAccount'
+      required:
+      - data
+  parameters:
+    filterAdAccounts:
+      name: filter
+      in: query
+      required: false
+      description: 'Filter results by field values using the syntax `filter[<field>][<op>]=<value>`.
+
+
+        Operators by field type:
+
+        - **string**: `eq`, `ne`, `in`, `notIn`, `isNull`, `isNotNull`
+
+        - **number**: `eq`, `ne`, `gt`, `gte`, `lt`, `lte`, `in`, `notIn`, `isNull`, `isNotNull`
+
+        - **boolean**: `eq`, `ne`, `isNull`, `isNotNull`
+
+        - **date**: `eq`, `ne`, `gt`, `gte`, `lt`, `lte`, `isNull`, `isNotNull`
+
+
+        For `in` and `notIn`, provide comma-separated values: `filter[tag_id][in]=a,b,c`.
+
+        For `isNull` and `isNotNull`, the value is ignored.
+
+
+        Multiple filters are combined with AND.
+
+
+        Examples:
+
+        - `filter[ad_account_id][eq]=acc_abc123`
+
+        - `filter[ad_account_name][in]=Brand,Prospecting`
+
+        - `filter[is_deleted][eq]=false`'
+      style: deepObject
+      explode: true
+      schema:
+        type: object
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: 'M2M Bearer token issued by Stytch. Pass as `Authorization: Bearer <token>`.
+
+
+        Example: `Authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...`'
+    clientId:
+      type: apiKey
+      in: header
+      name: x-client-id
+      description: 'Client identifier that must match the `client_id` claim in the Bearer token.
+
+
+        Example: `x-client-id: m2m-client-00000000-0000-0000-0000-000000000000`'

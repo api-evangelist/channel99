@@ -1,0 +1,283 @@
+openapi: 3.2.0
+info:
+  title: Pulsar Visits API
+  description: Channel99 Bulk Data Transfer REST API
+  version: 1.0.0
+servers:
+- url: /
+tags:
+- name: Visits
+  description: Website visit events — `GET /events/visits`
+paths:
+  /events/visits:
+    get:
+      tags:
+      - Visits
+      summary: List visits
+      operationId: getVisits
+      security:
+      - bearerAuth: []
+        clientId: []
+      parameters:
+      - name: x-client-id
+        in: header
+        required: true
+        schema:
+          type: string
+        description: Client identifier matching the authenticated token
+        example: m2m-client-00000000-0000-0000-0000-000000000000
+      - $ref: '#/components/parameters/cursor'
+      - $ref: '#/components/parameters/listLimit'
+      - $ref: '#/components/parameters/filterVisits'
+      - $ref: '#/components/parameters/sortVisits'
+      responses:
+        '200':
+          description: A page of visit records
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedVisits'
+        '400':
+          description: Bad request – missing instance, invalid cursor, invalid filter, invalid sort, or invalid limit
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized – missing or malformed credentials
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Forbidden – invalid token or client mismatch
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+components:
+  responses:
+    TooManyRequests:
+      description: 'Rate limit exceeded – too many requests from this client.
+
+
+        Limits:
+
+        - `POST /auth/token`: 20 req/min per `client_id` (app), plus WAF per-IP limit
+
+        - `/events/*` and `/dimensions/*`: burst limit of 100 req / 10s per client (app)
+
+        - All authenticated routes: WAF 60 req/s per `x-client-id` (5-minute window)
+
+        - `/ip/*` routes: WAF elevated tier (app burst limit does not apply)
+
+
+        App-level limits can be disabled via `PULSAR_APP_RATE_LIMITS=0|false|off` (WAF still applies).'
+      headers:
+        Retry-After:
+          description: Number of seconds to wait before retrying
+          schema:
+            type: integer
+            example: 60
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    NotFound:
+      description: Not found – no matching route or resource (code `err:pulsar.core.not-found`)
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+  schemas:
+    Visit:
+      type: object
+      properties:
+        visit_event_id:
+          type: string
+        event_date:
+          type: string
+          format: date-time
+        channel_id:
+          type:
+          - string
+          - 'null'
+        vendor_id:
+          type:
+          - string
+          - 'null'
+        tag_id:
+          type: string
+        company_id:
+          type: string
+        audience_id_list:
+          type:
+          - array
+          - 'null'
+          items:
+            type: string
+        ad_account_id:
+          type:
+          - string
+          - 'null'
+        ad_campaign_group_id:
+          type:
+          - string
+          - 'null'
+        ad_campaign_id:
+          type:
+          - string
+          - 'null'
+        ad_group_id:
+          type:
+          - string
+          - 'null'
+        ad_id:
+          type:
+          - string
+          - 'null'
+        ad_detail_id:
+          type:
+          - string
+          - 'null'
+        current_page:
+          type: string
+        c99_user_cookie_id:
+          type: string
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Error class name
+        code:
+          type: string
+          description: Machine-readable error code (e.g. `err:pulsar.request.invalid-limit`, `err:pulsar.core.not-found`)
+          example: err:pulsar.request.invalid-limit
+        message:
+          type: string
+          description: Human-readable description
+      required:
+      - error
+      - code
+      - message
+    PaginatedVisits:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Visit'
+        nextCursor:
+          type:
+          - string
+          - 'null'
+          description: Pass as the `cursor` query parameter to fetch the next page, or null when there are no more results.
+      required:
+      - data
+      - nextCursor
+  parameters:
+    listLimit:
+      name: limit
+      in: query
+      required: false
+      description: 'Maximum number of records to return in this page.
+
+        Omit to use the default (200); the maximum allowed value is 1000.
+
+        Values above the maximum return HTTP 400 with code `err:pulsar.request.invalid-limit`.'
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 1000
+    cursor:
+      name: cursor
+      in: query
+      required: false
+      description: 'Opaque pagination token from the previous response’s `nextCursor`. Omit on the first page.
+
+
+        Page size is controlled by the `limit` query parameter (default 200, maximum 1000).'
+      schema:
+        type: string
+    filterVisits:
+      name: filter
+      in: query
+      required: false
+      description: 'Filter results by field values using the syntax `filter[<field>][<op>]=<value>`.
+
+
+        Operators by field type:
+
+        - **string**: `eq`, `ne`, `in`, `notIn`, `isNull`, `isNotNull`
+
+        - **number**: `eq`, `ne`, `gt`, `gte`, `lt`, `lte`, `in`, `notIn`, `isNull`, `isNotNull`
+
+        - **boolean**: `eq`, `ne`, `isNull`, `isNotNull`
+
+        - **date**: `eq`, `ne`, `gt`, `gte`, `lt`, `lte`, `isNull`, `isNotNull`
+
+
+        For `in` and `notIn`, provide comma-separated values: `filter[tag_id][in]=a,b,c`.
+
+        For `isNull` and `isNotNull`, the value is ignored.
+
+
+        Multiple filters are combined with AND.
+
+
+        Examples:
+
+        - `filter[event_date][gte]=2024-01-01`
+
+        - `filter[channel_id][isNull]=true`
+
+        - `filter[c99_user_cookie_id][eq]=usr_abc123`
+
+        - `filter[ad_campaign_id][in]=camp1,camp2`'
+      style: deepObject
+      explode: true
+      schema:
+        type: object
+    sortVisits:
+      name: sort
+      in: query
+      required: false
+      description: 'Sort results by a single field using the syntax `sort[<field>]=asc|desc`.
+
+
+        Sortable fields: `event_date`.
+
+
+        Examples:
+
+        - `sort[event_date]=desc`'
+      style: form
+      explode: true
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: 'M2M Bearer token issued by Stytch. Pass as `Authorization: Bearer <token>`.
+
+
+        Example: `Authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...`'
+    clientId:
+      type: apiKey
+      in: header
+      name: x-client-id
+      description: 'Client identifier that must match the `client_id` claim in the Bearer token.
+
+
+        Example: `x-client-id: m2m-client-00000000-0000-0000-0000-000000000000`'
