@@ -60,7 +60,7 @@ tags:
 - Advertising
 - Marketing Technology
 - Artificial Intelligence
-- Account-Based Marketing
+- Account Based Marketing
 - Reporting
 - MCP
 - Agent Ready
@@ -98,7 +98,7 @@ apis:
   tags:
   - MCP
   - agent-native
-  - marketing-intelligence
+  - Marketing Intelligence
   - llm-connector
   - Authentication
   tags_raw:
