@@ -65,18 +65,6 @@ paths:
           $ref: '#/components/responses/TooManyRequests'
 components:
   responses:
-    Unauthorized:
-      description: Unauthorized – invalid client_id or client_secret (code `err:pulsar.auth.invalid-credentials`)
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-    BadRequest:
-      description: Bad request – missing client_id or client_secret (code `err:pulsar.auth.missing-credentials`)
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
     TooManyRequests:
       description: 'Rate limit exceeded – too many requests from this client.
 
@@ -99,6 +87,18 @@ components:
           schema:
             type: integer
             example: 60
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    BadRequest:
+      description: Bad request – missing client_id or client_secret (code `err:pulsar.auth.missing-credentials`)
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Unauthorized:
+      description: Unauthorized – invalid client_id or client_secret (code `err:pulsar.auth.invalid-credentials`)
       content:
         application/json:
           schema:

@@ -63,7 +63,53 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
 components:
+  schemas:
+    AdCampaign:
+      type: object
+      properties:
+        ad_campaign_id:
+          type: string
+        ad_campaign_name:
+          type: string
+        is_deleted:
+          type: boolean
+      required:
+      - ad_campaign_id
+      - ad_campaign_name
+      - is_deleted
+    AdCampaignList:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/AdCampaign'
+      required:
+      - data
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Error class name
+        code:
+          type: string
+          description: Machine-readable error code (e.g. `err:pulsar.request.invalid-limit`, `err:pulsar.core.not-found`)
+          example: err:pulsar.request.invalid-limit
+        message:
+          type: string
+          description: Human-readable description
+      required:
+      - error
+      - code
+      - message
   responses:
+    NotFound:
+      description: Not found – no matching route or resource (code `err:pulsar.core.not-found`)
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
     TooManyRequests:
       description: 'Rate limit exceeded – too many requests from this client.
 
@@ -90,52 +136,6 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/Error'
-    NotFound:
-      description: Not found – no matching route or resource (code `err:pulsar.core.not-found`)
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-  schemas:
-    Error:
-      type: object
-      properties:
-        error:
-          type: string
-          description: Error class name
-        code:
-          type: string
-          description: Machine-readable error code (e.g. `err:pulsar.request.invalid-limit`, `err:pulsar.core.not-found`)
-          example: err:pulsar.request.invalid-limit
-        message:
-          type: string
-          description: Human-readable description
-      required:
-      - error
-      - code
-      - message
-    AdCampaign:
-      type: object
-      properties:
-        ad_campaign_id:
-          type: string
-        ad_campaign_name:
-          type: string
-        is_deleted:
-          type: boolean
-      required:
-      - ad_campaign_id
-      - ad_campaign_name
-      - is_deleted
-    AdCampaignList:
-      type: object
-      properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/AdCampaign'
-      required:
-      - data
   parameters:
     filterAdCampaigns:
       name: filter

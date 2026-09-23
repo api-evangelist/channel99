@@ -96,6 +96,44 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/Error'
+  parameters:
+    filterAudiences:
+      name: filter
+      in: query
+      required: false
+      description: 'Filter results by field values using the syntax `filter[<field>][<op>]=<value>`.
+
+
+        Operators by field type:
+
+        - **string**: `eq`, `ne`, `in`, `notIn`, `isNull`, `isNotNull`
+
+        - **number**: `eq`, `ne`, `gt`, `gte`, `lt`, `lte`, `in`, `notIn`, `isNull`, `isNotNull`
+
+        - **boolean**: `eq`, `ne`, `isNull`, `isNotNull`
+
+        - **date**: `eq`, `ne`, `gt`, `gte`, `lt`, `lte`, `isNull`, `isNotNull`
+
+
+        For `in` and `notIn`, provide comma-separated values: `filter[tag_id][in]=a,b,c`.
+
+        For `isNull` and `isNotNull`, the value is ignored.
+
+
+        Multiple filters are combined with AND.
+
+
+        Examples:
+
+        - `filter[audience_id][eq]=aud_abc123`
+
+        - `filter[audience_name][in]=Retargeting,Prospecting`
+
+        - `filter[is_deleted][eq]=false`'
+      style: deepObject
+      explode: true
+      schema:
+        type: object
   schemas:
     Audience:
       type: object
@@ -139,44 +177,6 @@ components:
             $ref: '#/components/schemas/Audience'
       required:
       - data
-  parameters:
-    filterAudiences:
-      name: filter
-      in: query
-      required: false
-      description: 'Filter results by field values using the syntax `filter[<field>][<op>]=<value>`.
-
-
-        Operators by field type:
-
-        - **string**: `eq`, `ne`, `in`, `notIn`, `isNull`, `isNotNull`
-
-        - **number**: `eq`, `ne`, `gt`, `gte`, `lt`, `lte`, `in`, `notIn`, `isNull`, `isNotNull`
-
-        - **boolean**: `eq`, `ne`, `isNull`, `isNotNull`
-
-        - **date**: `eq`, `ne`, `gt`, `gte`, `lt`, `lte`, `isNull`, `isNotNull`
-
-
-        For `in` and `notIn`, provide comma-separated values: `filter[tag_id][in]=a,b,c`.
-
-        For `isNull` and `isNotNull`, the value is ignored.
-
-
-        Multiple filters are combined with AND.
-
-
-        Examples:
-
-        - `filter[audience_id][eq]=aud_abc123`
-
-        - `filter[audience_name][in]=Retargeting,Prospecting`
-
-        - `filter[is_deleted][eq]=false`'
-      style: deepObject
-      explode: true
-      schema:
-        type: object
   securitySchemes:
     bearerAuth:
       type: http

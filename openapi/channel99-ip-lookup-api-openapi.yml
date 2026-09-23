@@ -89,6 +89,12 @@ paths:
                 $ref: '#/components/schemas/Error'
 components:
   responses:
+    NotFound:
+      description: Not found – no matching route or resource (code `err:pulsar.core.not-found`)
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
     TooManyRequests:
       description: 'Rate limit exceeded – too many requests from this client.
 
@@ -115,13 +121,24 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/Error'
-    NotFound:
-      description: Not found – no matching route or resource (code `err:pulsar.core.not-found`)
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
   schemas:
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Error class name
+        code:
+          type: string
+          description: Machine-readable error code (e.g. `err:pulsar.request.invalid-limit`, `err:pulsar.core.not-found`)
+          example: err:pulsar.request.invalid-limit
+        message:
+          type: string
+          description: Human-readable description
+      required:
+      - error
+      - code
+      - message
     IpCompanyRecord:
       type: object
       description: Company information associated with an IP address. Company fields may be null when the IP address is known but a company relationship could not be determined.
@@ -161,23 +178,6 @@ components:
           description: Null when the company relationship for this IP could not be resolved.
       required:
       - ip_address
-    Error:
-      type: object
-      properties:
-        error:
-          type: string
-          description: Error class name
-        code:
-          type: string
-          description: Machine-readable error code (e.g. `err:pulsar.request.invalid-limit`, `err:pulsar.core.not-found`)
-          example: err:pulsar.request.invalid-limit
-        message:
-          type: string
-          description: Human-readable description
-      required:
-      - error
-      - code
-      - message
   securitySchemes:
     bearerAuth:
       type: http

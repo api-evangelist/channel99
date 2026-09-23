@@ -63,53 +63,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
 components:
-  responses:
-    TooManyRequests:
-      description: 'Rate limit exceeded – too many requests from this client.
-
-
-        Limits:
-
-        - `POST /auth/token`: 20 req/min per `client_id` (app), plus WAF per-IP limit
-
-        - `/events/*` and `/dimensions/*`: burst limit of 100 req / 10s per client (app)
-
-        - All authenticated routes: WAF 60 req/s per `x-client-id` (5-minute window)
-
-        - `/ip/*` routes: WAF elevated tier (app burst limit does not apply)
-
-
-        App-level limits can be disabled via `PULSAR_APP_RATE_LIMITS=0|false|off` (WAF still applies).'
-      headers:
-        Retry-After:
-          description: Number of seconds to wait before retrying
-          schema:
-            type: integer
-            example: 60
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-    NotFound:
-      description: Not found – no matching route or resource (code `err:pulsar.core.not-found`)
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
   schemas:
-    AdAccount:
-      type: object
-      properties:
-        ad_account_id:
-          type: string
-        ad_account_name:
-          type: string
-        is_deleted:
-          type: boolean
-      required:
-      - ad_account_id
-      - ad_account_name
-      - is_deleted
     Error:
       type: object
       properties:
@@ -127,6 +81,19 @@ components:
       - error
       - code
       - message
+    AdAccount:
+      type: object
+      properties:
+        ad_account_id:
+          type: string
+        ad_account_name:
+          type: string
+        is_deleted:
+          type: boolean
+      required:
+      - ad_account_id
+      - ad_account_name
+      - is_deleted
     AdAccountList:
       type: object
       properties:
@@ -174,6 +141,39 @@ components:
       explode: true
       schema:
         type: object
+  responses:
+    NotFound:
+      description: Not found – no matching route or resource (code `err:pulsar.core.not-found`)
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    TooManyRequests:
+      description: 'Rate limit exceeded – too many requests from this client.
+
+
+        Limits:
+
+        - `POST /auth/token`: 20 req/min per `client_id` (app), plus WAF per-IP limit
+
+        - `/events/*` and `/dimensions/*`: burst limit of 100 req / 10s per client (app)
+
+        - All authenticated routes: WAF 60 req/s per `x-client-id` (5-minute window)
+
+        - `/ip/*` routes: WAF elevated tier (app burst limit does not apply)
+
+
+        App-level limits can be disabled via `PULSAR_APP_RATE_LIMITS=0|false|off` (WAF still applies).'
+      headers:
+        Retry-After:
+          description: Number of seconds to wait before retrying
+          schema:
+            type: integer
+            example: 60
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
   securitySchemes:
     bearerAuth:
       type: http

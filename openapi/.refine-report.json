@@ -1,0 +1,52 @@
+{
+  "provider": "channel99",
+  "sources": [
+    "_original/channel99-pulsar-openapi.json"
+  ],
+  "outputs": [
+    "channel99-ad-accounts-api-openapi.yml",
+    "channel99-ad-campaign-groups-api-openapi.yml",
+    "channel99-ad-campaigns-api-openapi.yml",
+    "channel99-ad-groups-api-openapi.yml",
+    "channel99-ad-units-api-openapi.yml",
+    "channel99-ads-api-openapi.yml",
+    "channel99-audiences-api-openapi.yml",
+    "channel99-auth-api-openapi.yml",
+    "channel99-channels-api-openapi.yml",
+    "channel99-companies-api-openapi.yml",
+    "channel99-health-api-openapi.yml",
+    "channel99-ip-lookup-api-openapi.yml",
+    "channel99-impressions-api-openapi.yml",
+    "channel99-intents-api-openapi.yml",
+    "channel99-pageviews-api-openapi.yml",
+    "channel99-vendors-api-openapi.yml",
+    "channel99-visits-api-openapi.yml"
+  ],
+  "archived": [],
+  "errors": [],
+  "warnings": [],
+  "notes": [
+    "sourced from openapi/_original/ (1 archived document(s)); previously refined output at the top level was skipped rather than re-split",
+    "channel99-pulsar-openapi.json: upgraded openapi 3.0.3 -> OpenAPI 3.2.0",
+    "apis.yml register: already-registered"
+  ],
+  "skipped": [
+    "channel99-ad-accounts-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "channel99-ad-campaign-groups-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "channel99-ad-campaigns-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "channel99-ad-groups-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "channel99-ad-units-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "channel99-ads-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "channel99-audiences-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "channel99-auth-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "channel99-channels-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "channel99-companies-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "channel99-health-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "channel99-impressions-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "channel99-intents-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "channel99-ip-lookup-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "channel99-pageviews-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "channel99-vendors-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "channel99-visits-api-openapi.yml: previously refined output, superseded by openapi/_original/"
+  ]
+}

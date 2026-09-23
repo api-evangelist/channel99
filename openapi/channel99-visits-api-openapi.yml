@@ -66,39 +66,6 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
 components:
-  responses:
-    TooManyRequests:
-      description: 'Rate limit exceeded – too many requests from this client.
-
-
-        Limits:
-
-        - `POST /auth/token`: 20 req/min per `client_id` (app), plus WAF per-IP limit
-
-        - `/events/*` and `/dimensions/*`: burst limit of 100 req / 10s per client (app)
-
-        - All authenticated routes: WAF 60 req/s per `x-client-id` (5-minute window)
-
-        - `/ip/*` routes: WAF elevated tier (app burst limit does not apply)
-
-
-        App-level limits can be disabled via `PULSAR_APP_RATE_LIMITS=0|false|off` (WAF still applies).'
-      headers:
-        Retry-After:
-          description: Number of seconds to wait before retrying
-          schema:
-            type: integer
-            example: 60
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-    NotFound:
-      description: Not found – no matching route or resource (code `err:pulsar.core.not-found`)
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
   schemas:
     Visit:
       type: object
@@ -187,19 +154,6 @@ components:
       - data
       - nextCursor
   parameters:
-    listLimit:
-      name: limit
-      in: query
-      required: false
-      description: 'Maximum number of records to return in this page.
-
-        Omit to use the default (200); the maximum allowed value is 1000.
-
-        Values above the maximum return HTTP 400 with code `err:pulsar.request.invalid-limit`.'
-      schema:
-        type: integer
-        minimum: 1
-        maximum: 1000
     cursor:
       name: cursor
       in: query
@@ -210,6 +164,21 @@ components:
         Page size is controlled by the `limit` query parameter (default 200, maximum 1000).'
       schema:
         type: string
+    sortVisits:
+      name: sort
+      in: query
+      required: false
+      description: 'Sort results by a single field using the syntax `sort[<field>]=asc|desc`.
+
+
+        Sortable fields: `event_date`.
+
+
+        Examples:
+
+        - `sort[event_date]=desc`'
+      style: form
+      explode: true
     filterVisits:
       name: filter
       in: query
@@ -249,21 +218,52 @@ components:
       explode: true
       schema:
         type: object
-    sortVisits:
-      name: sort
+    listLimit:
+      name: limit
       in: query
       required: false
-      description: 'Sort results by a single field using the syntax `sort[<field>]=asc|desc`.
+      description: 'Maximum number of records to return in this page.
+
+        Omit to use the default (200); the maximum allowed value is 1000.
+
+        Values above the maximum return HTTP 400 with code `err:pulsar.request.invalid-limit`.'
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 1000
+  responses:
+    NotFound:
+      description: Not found – no matching route or resource (code `err:pulsar.core.not-found`)
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    TooManyRequests:
+      description: 'Rate limit exceeded – too many requests from this client.
 
 
-        Sortable fields: `event_date`.
+        Limits:
+
+        - `POST /auth/token`: 20 req/min per `client_id` (app), plus WAF per-IP limit
+
+        - `/events/*` and `/dimensions/*`: burst limit of 100 req / 10s per client (app)
+
+        - All authenticated routes: WAF 60 req/s per `x-client-id` (5-minute window)
+
+        - `/ip/*` routes: WAF elevated tier (app burst limit does not apply)
 
 
-        Examples:
-
-        - `sort[event_date]=desc`'
-      style: form
-      explode: true
+        App-level limits can be disabled via `PULSAR_APP_RATE_LIMITS=0|false|off` (WAF still applies).'
+      headers:
+        Retry-After:
+          description: Number of seconds to wait before retrying
+          schema:
+            type: integer
+            example: 60
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
   securitySchemes:
     bearerAuth:
       type: http
