@@ -64,7 +64,31 @@ paths:
         '429':
           $ref: '#/components/responses/TooManyRequests'
 components:
+  schemas:
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Error class name
+        code:
+          type: string
+          description: Machine-readable error code (e.g. `err:pulsar.request.invalid-limit`, `err:pulsar.core.not-found`)
+          example: err:pulsar.request.invalid-limit
+        message:
+          type: string
+          description: Human-readable description
+      required:
+      - error
+      - code
+      - message
   responses:
+    Unauthorized:
+      description: Unauthorized – invalid client_id or client_secret (code `err:pulsar.auth.invalid-credentials`)
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
     TooManyRequests:
       description: 'Rate limit exceeded – too many requests from this client.
 
@@ -97,30 +121,6 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/Error'
-    Unauthorized:
-      description: Unauthorized – invalid client_id or client_secret (code `err:pulsar.auth.invalid-credentials`)
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-  schemas:
-    Error:
-      type: object
-      properties:
-        error:
-          type: string
-          description: Error class name
-        code:
-          type: string
-          description: Machine-readable error code (e.g. `err:pulsar.request.invalid-limit`, `err:pulsar.core.not-found`)
-          example: err:pulsar.request.invalid-limit
-        message:
-          type: string
-          description: Human-readable description
-      required:
-      - error
-      - code
-      - message
   securitySchemes:
     bearerAuth:
       type: http

@@ -66,102 +66,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
 components:
-  parameters:
-    filterPageviews:
-      name: filter
-      in: query
-      required: false
-      description: 'Filter results by field values using the syntax `filter[<field>][<op>]=<value>`.
-
-
-        Operators by field type:
-
-        - **string**: `eq`, `ne`, `in`, `notIn`, `isNull`, `isNotNull`
-
-        - **number**: `eq`, `ne`, `gt`, `gte`, `lt`, `lte`, `in`, `notIn`, `isNull`, `isNotNull`
-
-        - **boolean**: `eq`, `ne`, `isNull`, `isNotNull`
-
-        - **date**: `eq`, `ne`, `gt`, `gte`, `lt`, `lte`, `isNull`, `isNotNull`
-
-
-        For `in` and `notIn`, provide comma-separated values: `filter[tag_id][in]=a,b,c`.
-
-        For `isNull` and `isNotNull`, the value is ignored.
-
-
-        Multiple filters are combined with AND.
-
-
-        Examples:
-
-        - `filter[event_date][gte]=2024-01-01&filter[event_date][lte]=2024-12-31`
-
-        - `filter[tag_id][in]=foo,bar`
-
-        - `filter[current_page][eq]=/products`
-
-        - `filter[channel_id][isNull]=true`'
-      style: deepObject
-      explode: true
-      schema:
-        type: object
-    cursor:
-      name: cursor
-      in: query
-      required: false
-      description: 'Opaque pagination token from the previous response’s `nextCursor`. Omit on the first page.
-
-
-        Page size is controlled by the `limit` query parameter (default 200, maximum 1000).'
-      schema:
-        type: string
-    listLimit:
-      name: limit
-      in: query
-      required: false
-      description: 'Maximum number of records to return in this page.
-
-        Omit to use the default (200); the maximum allowed value is 1000.
-
-        Values above the maximum return HTTP 400 with code `err:pulsar.request.invalid-limit`.'
-      schema:
-        type: integer
-        minimum: 1
-        maximum: 1000
-    sortPageviews:
-      name: sort
-      in: query
-      required: false
-      description: 'Sort results by a single field using the syntax `sort[<field>]=asc|desc`.
-
-
-        Sortable fields: `event_date`.
-
-
-        Examples:
-
-        - `sort[event_date]=desc`'
-      style: form
-      explode: true
   schemas:
-    Error:
-      type: object
-      properties:
-        error:
-          type: string
-          description: Error class name
-        code:
-          type: string
-          description: Machine-readable error code (e.g. `err:pulsar.request.invalid-limit`, `err:pulsar.core.not-found`)
-          example: err:pulsar.request.invalid-limit
-        message:
-          type: string
-          description: Human-readable description
-      required:
-      - error
-      - code
-      - message
     Pageview:
       type: object
       properties:
@@ -220,6 +125,23 @@ components:
           type: string
         c99_user_cookie_id:
           type: string
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Error class name
+        code:
+          type: string
+          description: Machine-readable error code (e.g. `err:pulsar.request.invalid-limit`, `err:pulsar.core.not-found`)
+          example: err:pulsar.request.invalid-limit
+        message:
+          type: string
+          description: Human-readable description
+      required:
+      - error
+      - code
+      - message
     PaginatedPageviews:
       type: object
       properties:
@@ -235,6 +157,84 @@ components:
       required:
       - data
       - nextCursor
+  parameters:
+    listLimit:
+      name: limit
+      in: query
+      required: false
+      description: 'Maximum number of records to return in this page.
+
+        Omit to use the default (200); the maximum allowed value is 1000.
+
+        Values above the maximum return HTTP 400 with code `err:pulsar.request.invalid-limit`.'
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 1000
+    filterPageviews:
+      name: filter
+      in: query
+      required: false
+      description: 'Filter results by field values using the syntax `filter[<field>][<op>]=<value>`.
+
+
+        Operators by field type:
+
+        - **string**: `eq`, `ne`, `in`, `notIn`, `isNull`, `isNotNull`
+
+        - **number**: `eq`, `ne`, `gt`, `gte`, `lt`, `lte`, `in`, `notIn`, `isNull`, `isNotNull`
+
+        - **boolean**: `eq`, `ne`, `isNull`, `isNotNull`
+
+        - **date**: `eq`, `ne`, `gt`, `gte`, `lt`, `lte`, `isNull`, `isNotNull`
+
+
+        For `in` and `notIn`, provide comma-separated values: `filter[tag_id][in]=a,b,c`.
+
+        For `isNull` and `isNotNull`, the value is ignored.
+
+
+        Multiple filters are combined with AND.
+
+
+        Examples:
+
+        - `filter[event_date][gte]=2024-01-01&filter[event_date][lte]=2024-12-31`
+
+        - `filter[tag_id][in]=foo,bar`
+
+        - `filter[current_page][eq]=/products`
+
+        - `filter[channel_id][isNull]=true`'
+      style: deepObject
+      explode: true
+      schema:
+        type: object
+    sortPageviews:
+      name: sort
+      in: query
+      required: false
+      description: 'Sort results by a single field using the syntax `sort[<field>]=asc|desc`.
+
+
+        Sortable fields: `event_date`.
+
+
+        Examples:
+
+        - `sort[event_date]=desc`'
+      style: form
+      explode: true
+    cursor:
+      name: cursor
+      in: query
+      required: false
+      description: 'Opaque pagination token from the previous response’s `nextCursor`. Omit on the first page.
+
+
+        Page size is controlled by the `limit` query parameter (default 200, maximum 1000).'
+      schema:
+        type: string
   responses:
     NotFound:
       description: Not found – no matching route or resource (code `err:pulsar.core.not-found`)

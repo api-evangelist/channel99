@@ -64,6 +64,12 @@ paths:
                 $ref: '#/components/schemas/Error'
 components:
   responses:
+    NotFound:
+      description: Not found – no matching route or resource (code `err:pulsar.core.not-found`)
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
     TooManyRequests:
       description: 'Rate limit exceeded – too many requests from this client.
 
@@ -90,12 +96,49 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/Error'
-    NotFound:
-      description: Not found – no matching route or resource (code `err:pulsar.core.not-found`)
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
+  schemas:
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Error class name
+        code:
+          type: string
+          description: Machine-readable error code (e.g. `err:pulsar.request.invalid-limit`, `err:pulsar.core.not-found`)
+          example: err:pulsar.request.invalid-limit
+        message:
+          type: string
+          description: Human-readable description
+      required:
+      - error
+      - code
+      - message
+    AudienceList:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Audience'
+      required:
+      - data
+    Audience:
+      type: object
+      properties:
+        audience_id:
+          type: string
+        audience_name:
+          type: string
+        audience_description:
+          type: string
+        is_deleted:
+          type: boolean
+      required:
+      - audience_id
+      - audience_name
+      - audience_description
+      - is_deleted
   parameters:
     filterAudiences:
       name: filter
@@ -134,49 +177,6 @@ components:
       explode: true
       schema:
         type: object
-  schemas:
-    Audience:
-      type: object
-      properties:
-        audience_id:
-          type: string
-        audience_name:
-          type: string
-        audience_description:
-          type: string
-        is_deleted:
-          type: boolean
-      required:
-      - audience_id
-      - audience_name
-      - audience_description
-      - is_deleted
-    Error:
-      type: object
-      properties:
-        error:
-          type: string
-          description: Error class name
-        code:
-          type: string
-          description: Machine-readable error code (e.g. `err:pulsar.request.invalid-limit`, `err:pulsar.core.not-found`)
-          example: err:pulsar.request.invalid-limit
-        message:
-          type: string
-          description: Human-readable description
-      required:
-      - error
-      - code
-      - message
-    AudienceList:
-      type: object
-      properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/Audience'
-      required:
-      - data
   securitySchemes:
     bearerAuth:
       type: http

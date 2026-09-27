@@ -93,7 +93,7 @@ apis:
   baseURL: https://mcp.channel99.com
   tags:
   - MCP
-  - agent-native
+  - Agent-Native
   - Marketing Intelligence
   - llm-connector
   - Authentication
