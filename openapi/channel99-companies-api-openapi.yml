@@ -63,6 +63,55 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
 components:
+  schemas:
+    Company:
+      type: object
+      properties:
+        company_id:
+          type: string
+        company_domain:
+          type: string
+        company_name:
+          type: string
+        sector_id:
+          type: string
+        region_id:
+          type: string
+        revenue_range_id:
+          type: string
+      required:
+      - company_id
+      - company_domain
+      - company_name
+      - sector_id
+      - region_id
+      - revenue_range_id
+    CompanyList:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Company'
+      required:
+      - data
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Error class name
+        code:
+          type: string
+          description: Machine-readable error code (e.g. `err:pulsar.request.invalid-limit`, `err:pulsar.core.not-found`)
+          example: err:pulsar.request.invalid-limit
+        message:
+          type: string
+          description: Human-readable description
+      required:
+      - error
+      - code
+      - message
   parameters:
     filterCompanies:
       name: filter
@@ -138,55 +187,6 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/Error'
-  schemas:
-    Error:
-      type: object
-      properties:
-        error:
-          type: string
-          description: Error class name
-        code:
-          type: string
-          description: Machine-readable error code (e.g. `err:pulsar.request.invalid-limit`, `err:pulsar.core.not-found`)
-          example: err:pulsar.request.invalid-limit
-        message:
-          type: string
-          description: Human-readable description
-      required:
-      - error
-      - code
-      - message
-    Company:
-      type: object
-      properties:
-        company_id:
-          type: string
-        company_domain:
-          type: string
-        company_name:
-          type: string
-        sector_id:
-          type: string
-        region_id:
-          type: string
-        revenue_range_id:
-          type: string
-      required:
-      - company_id
-      - company_domain
-      - company_name
-      - sector_id
-      - region_id
-      - revenue_range_id
-    CompanyList:
-      type: object
-      properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/Company'
-      required:
-      - data
   securitySchemes:
     bearerAuth:
       type: http

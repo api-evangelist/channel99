@@ -97,6 +97,31 @@ components:
           schema:
             $ref: '#/components/schemas/Error'
   schemas:
+    Audience:
+      type: object
+      properties:
+        audience_id:
+          type: string
+        audience_name:
+          type: string
+        audience_description:
+          type: string
+        is_deleted:
+          type: boolean
+      required:
+      - audience_id
+      - audience_name
+      - audience_description
+      - is_deleted
+    AudienceList:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Audience'
+      required:
+      - data
     Error:
       type: object
       properties:
@@ -114,31 +139,6 @@ components:
       - error
       - code
       - message
-    AudienceList:
-      type: object
-      properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/Audience'
-      required:
-      - data
-    Audience:
-      type: object
-      properties:
-        audience_id:
-          type: string
-        audience_name:
-          type: string
-        audience_description:
-          type: string
-        is_deleted:
-          type: boolean
-      required:
-      - audience_id
-      - audience_name
-      - audience_description
-      - is_deleted
   parameters:
     filterAudiences:
       name: filter
