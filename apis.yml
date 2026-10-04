@@ -532,6 +532,9 @@ maintainers:
 - FN: APIs.json
   email: info@apis.io
 common:
+- type: CapabilityMap
+  url: capabilities/channel99-capability-edges.yml
+  name: Channel99 Business Capability Map
 - type: Authentication
   url: authentication/channel99-authentication.yml
 - type: Website

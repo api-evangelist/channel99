@@ -1,0 +1,50 @@
+slug: channel99
+provider: Channel99
+generated_by: planning/capability-mapping/scripts/classify_capabilities.py
+model: claude-opus-5
+frame:
+- Software & Technology
+min_confidence: 0.7
+capability_model:
+  source: https://github.com/vincentmakes/turbo-ea-capabilities
+  license: CC-BY-4.0
+  attribution: Turbo EA Capabilities by Vincent Verdet — Turbo EA, https://github.com/vincentmakes/turbo-ea-capabilities,
+    CC BY 4.0
+  notice: NOTICE
+edge_count: 4
+edges:
+- tag: Ads
+  spec_file: channel99-ads-api-openapi.yml
+  capability_id: BC-400.60
+  capability_id_l1: BC-400
+  capability_name: Digital Marketing Management
+  confidence: 0.75
+  evidence: GET /dimensions/ads  getAds  List ads; vendor 'verify B2B ad delivery'
+  reason: Listing ads as reporting dimensions for ad delivery verification is paid digital media management.
+- tag: Ad Groups
+  spec_file: channel99-ad-groups-api-openapi.yml
+  capability_id: BC-400.60
+  capability_id_l1: BC-400
+  capability_name: Digital Marketing Management
+  confidence: 0.72
+  evidence: GET /dimensions/ad-groups  getAdGroups  List ad groups; schemas AdGroup, AdGroupList
+  reason: Ad group dimensions are paid-media campaign structure data in a B2B advertising performance
+    platform, squarely digital marketing/paid media management rather than any other capability.
+- tag: Ad Units
+  spec_file: channel99-ad-units-api-openapi.yml
+  capability_id: BC-400.60
+  capability_id_l1: BC-400
+  capability_name: Digital Marketing Management
+  confidence: 0.72
+  evidence: GET /dimensions/ad-units  getAdUnits  List ad units
+  reason: Ad unit dimensions describe paid digital ad placements used for ad delivery verification and
+    reporting — digital marketing management.
+- tag: Impressions
+  spec_file: channel99-impressions-api-openapi.yml
+  capability_id: BC-400.60
+  capability_id_l1: BC-400
+  capability_name: Digital Marketing Management
+  confidence: 0.7
+  evidence: GET /events/impressions  getImpressions  List impressions; schema PaginatedImpressions
+  reason: Ad impression event data supports paid media delivery verification and measurement — digital
+    marketing management.
