@@ -96,49 +96,6 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/Error'
-  schemas:
-    Audience:
-      type: object
-      properties:
-        audience_id:
-          type: string
-        audience_name:
-          type: string
-        audience_description:
-          type: string
-        is_deleted:
-          type: boolean
-      required:
-      - audience_id
-      - audience_name
-      - audience_description
-      - is_deleted
-    AudienceList:
-      type: object
-      properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/Audience'
-      required:
-      - data
-    Error:
-      type: object
-      properties:
-        error:
-          type: string
-          description: Error class name
-        code:
-          type: string
-          description: Machine-readable error code (e.g. `err:pulsar.request.invalid-limit`, `err:pulsar.core.not-found`)
-          example: err:pulsar.request.invalid-limit
-        message:
-          type: string
-          description: Human-readable description
-      required:
-      - error
-      - code
-      - message
   parameters:
     filterAudiences:
       name: filter
@@ -177,6 +134,49 @@ components:
       explode: true
       schema:
         type: object
+  schemas:
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Error class name
+        code:
+          type: string
+          description: Machine-readable error code (e.g. `err:pulsar.request.invalid-limit`, `err:pulsar.core.not-found`)
+          example: err:pulsar.request.invalid-limit
+        message:
+          type: string
+          description: Human-readable description
+      required:
+      - error
+      - code
+      - message
+    Audience:
+      type: object
+      properties:
+        audience_id:
+          type: string
+        audience_name:
+          type: string
+        audience_description:
+          type: string
+        is_deleted:
+          type: boolean
+      required:
+      - audience_id
+      - audience_name
+      - audience_description
+      - is_deleted
+    AudienceList:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Audience'
+      required:
+      - data
   securitySchemes:
     bearerAuth:
       type: http

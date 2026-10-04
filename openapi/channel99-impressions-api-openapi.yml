@@ -66,7 +66,57 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
 components:
+  responses:
+    NotFound:
+      description: Not found – no matching route or resource (code `err:pulsar.core.not-found`)
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    TooManyRequests:
+      description: 'Rate limit exceeded – too many requests from this client.
+
+
+        Limits:
+
+        - `POST /auth/token`: 20 req/min per `client_id` (app), plus WAF per-IP limit
+
+        - `/events/*` and `/dimensions/*`: burst limit of 100 req / 10s per client (app)
+
+        - All authenticated routes: WAF 60 req/s per `x-client-id` (5-minute window)
+
+        - `/ip/*` routes: WAF elevated tier (app burst limit does not apply)
+
+
+        App-level limits can be disabled via `PULSAR_APP_RATE_LIMITS=0|false|off` (WAF still applies).'
+      headers:
+        Retry-After:
+          description: Number of seconds to wait before retrying
+          schema:
+            type: integer
+            example: 60
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
   schemas:
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Error class name
+        code:
+          type: string
+          description: Machine-readable error code (e.g. `err:pulsar.request.invalid-limit`, `err:pulsar.core.not-found`)
+          example: err:pulsar.request.invalid-limit
+        message:
+          type: string
+          description: Human-readable description
+      required:
+      - error
+      - code
+      - message
     PaginatedImpressions:
       type: object
       properties:
@@ -142,23 +192,6 @@ components:
           - 'null'
         has_click:
           type: boolean
-    Error:
-      type: object
-      properties:
-        error:
-          type: string
-          description: Error class name
-        code:
-          type: string
-          description: Machine-readable error code (e.g. `err:pulsar.request.invalid-limit`, `err:pulsar.core.not-found`)
-          example: err:pulsar.request.invalid-limit
-        message:
-          type: string
-          description: Human-readable description
-      required:
-      - error
-      - code
-      - message
   parameters:
     sortImpressions:
       name: sort
@@ -175,19 +208,16 @@ components:
         - `sort[event_date]=desc`'
       style: form
       explode: true
-    listLimit:
-      name: limit
+    cursor:
+      name: cursor
       in: query
       required: false
-      description: 'Maximum number of records to return in this page.
+      description: 'Opaque pagination token from the previous response’s `nextCursor`. Omit on the first page.
 
-        Omit to use the default (200); the maximum allowed value is 1000.
 
-        Values above the maximum return HTTP 400 with code `err:pulsar.request.invalid-limit`.'
+        Page size is controlled by the `limit` query parameter (default 200, maximum 1000).'
       schema:
-        type: integer
-        minimum: 1
-        maximum: 1000
+        type: string
     filterImpressions:
       name: filter
       in: query
@@ -229,49 +259,19 @@ components:
       explode: true
       schema:
         type: object
-    cursor:
-      name: cursor
+    listLimit:
+      name: limit
       in: query
       required: false
-      description: 'Opaque pagination token from the previous response’s `nextCursor`. Omit on the first page.
+      description: 'Maximum number of records to return in this page.
 
+        Omit to use the default (200); the maximum allowed value is 1000.
 
-        Page size is controlled by the `limit` query parameter (default 200, maximum 1000).'
+        Values above the maximum return HTTP 400 with code `err:pulsar.request.invalid-limit`.'
       schema:
-        type: string
-  responses:
-    NotFound:
-      description: Not found – no matching route or resource (code `err:pulsar.core.not-found`)
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-    TooManyRequests:
-      description: 'Rate limit exceeded – too many requests from this client.
-
-
-        Limits:
-
-        - `POST /auth/token`: 20 req/min per `client_id` (app), plus WAF per-IP limit
-
-        - `/events/*` and `/dimensions/*`: burst limit of 100 req / 10s per client (app)
-
-        - All authenticated routes: WAF 60 req/s per `x-client-id` (5-minute window)
-
-        - `/ip/*` routes: WAF elevated tier (app burst limit does not apply)
-
-
-        App-level limits can be disabled via `PULSAR_APP_RATE_LIMITS=0|false|off` (WAF still applies).'
-      headers:
-        Retry-After:
-          description: Number of seconds to wait before retrying
-          schema:
-            type: integer
-            example: 60
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
+        type: integer
+        minimum: 1
+        maximum: 1000
   securitySchemes:
     bearerAuth:
       type: http

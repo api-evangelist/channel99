@@ -67,6 +67,33 @@ paths:
                 $ref: '#/components/schemas/Error'
 components:
   parameters:
+    sortIntents:
+      name: sort
+      in: query
+      required: false
+      description: 'Sort results by a single field using the syntax `sort[<field>]=asc|desc`.
+
+
+        Sortable fields: `event_date`, `count_impressions`.
+
+
+        Examples:
+
+        - `sort[event_date]=desc`
+
+        - `sort[count_impressions]=desc`'
+      style: form
+      explode: true
+    cursor:
+      name: cursor
+      in: query
+      required: false
+      description: 'Opaque pagination token from the previous response’s `nextCursor`. Omit on the first page.
+
+
+        Page size is controlled by the `limit` query parameter (default 200, maximum 1000).'
+      schema:
+        type: string
     filterIntents:
       name: filter
       in: query
@@ -121,49 +148,7 @@ components:
         type: integer
         minimum: 1
         maximum: 1000
-    cursor:
-      name: cursor
-      in: query
-      required: false
-      description: 'Opaque pagination token from the previous response’s `nextCursor`. Omit on the first page.
-
-
-        Page size is controlled by the `limit` query parameter (default 200, maximum 1000).'
-      schema:
-        type: string
-    sortIntents:
-      name: sort
-      in: query
-      required: false
-      description: 'Sort results by a single field using the syntax `sort[<field>]=asc|desc`.
-
-
-        Sortable fields: `event_date`, `count_impressions`.
-
-
-        Examples:
-
-        - `sort[event_date]=desc`
-
-        - `sort[count_impressions]=desc`'
-      style: form
-      explode: true
   schemas:
-    PaginatedIntents:
-      type: object
-      properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/Intent'
-        nextCursor:
-          type:
-          - string
-          - 'null'
-          description: Pass as the `cursor` query parameter to fetch the next page, or null when there are no more results.
-      required:
-      - data
-      - nextCursor
     Intent:
       type: object
       properties:
@@ -221,6 +206,21 @@ components:
       - error
       - code
       - message
+    PaginatedIntents:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Intent'
+        nextCursor:
+          type:
+          - string
+          - 'null'
+          description: Pass as the `cursor` query parameter to fetch the next page, or null when there are no more results.
+      required:
+      - data
+      - nextCursor
   responses:
     NotFound:
       description: Not found – no matching route or resource (code `err:pulsar.core.not-found`)

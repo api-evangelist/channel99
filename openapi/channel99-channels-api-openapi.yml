@@ -63,43 +63,6 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
 components:
-  schemas:
-    ChannelList:
-      type: object
-      properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/Channel'
-      required:
-      - data
-    Channel:
-      type: object
-      properties:
-        channel_id:
-          type: string
-        channel_name:
-          type: string
-      required:
-      - channel_id
-      - channel_name
-    Error:
-      type: object
-      properties:
-        error:
-          type: string
-          description: Error class name
-        code:
-          type: string
-          description: Machine-readable error code (e.g. `err:pulsar.request.invalid-limit`, `err:pulsar.core.not-found`)
-          example: err:pulsar.request.invalid-limit
-        message:
-          type: string
-          description: Human-readable description
-      required:
-      - error
-      - code
-      - message
   responses:
     NotFound:
       description: Not found – no matching route or resource (code `err:pulsar.core.not-found`)
@@ -133,6 +96,43 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/Error'
+  schemas:
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Error class name
+        code:
+          type: string
+          description: Machine-readable error code (e.g. `err:pulsar.request.invalid-limit`, `err:pulsar.core.not-found`)
+          example: err:pulsar.request.invalid-limit
+        message:
+          type: string
+          description: Human-readable description
+      required:
+      - error
+      - code
+      - message
+    ChannelList:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Channel'
+      required:
+      - data
+    Channel:
+      type: object
+      properties:
+        channel_id:
+          type: string
+        channel_name:
+          type: string
+      required:
+      - channel_id
+      - channel_name
   parameters:
     filterChannels:
       name: filter
