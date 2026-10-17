@@ -66,6 +66,112 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
 components:
+  responses:
+    NotFound:
+      description: Not found – no matching route or resource (code `err:pulsar.core.not-found`)
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    TooManyRequests:
+      description: 'Rate limit exceeded – too many requests from this client.
+
+
+        Limits:
+
+        - `POST /auth/token`: 20 req/min per `client_id` (app), plus WAF per-IP limit
+
+        - `/events/*` and `/dimensions/*`: burst limit of 100 req / 10s per client (app)
+
+        - All authenticated routes: WAF 60 req/s per `x-client-id` (5-minute window)
+
+        - `/ip/*` routes: WAF elevated tier (app burst limit does not apply)
+
+
+        App-level limits can be disabled via `PULSAR_APP_RATE_LIMITS=0|false|off` (WAF still applies).'
+      headers:
+        Retry-After:
+          description: Number of seconds to wait before retrying
+          schema:
+            type: integer
+            example: 60
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+  schemas:
+    PaginatedIntents:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Intent'
+        nextCursor:
+          type:
+          - string
+          - 'null'
+          description: Pass as the `cursor` query parameter to fetch the next page, or null when there are no more results.
+      required:
+      - data
+      - nextCursor
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Error class name
+        code:
+          type: string
+          description: Machine-readable error code (e.g. `err:pulsar.request.invalid-limit`, `err:pulsar.core.not-found`)
+          example: err:pulsar.request.invalid-limit
+        message:
+          type: string
+          description: Human-readable description
+      required:
+      - error
+      - code
+      - message
+    Intent:
+      type: object
+      properties:
+        intent_event_id:
+          type: string
+        event_date:
+          type: string
+          format: date-time
+        channel_id:
+          type:
+          - string
+          - 'null'
+        vendor_id:
+          type:
+          - string
+          - 'null'
+        company_id:
+          type: string
+        audience_id_list:
+          type:
+          - array
+          - 'null'
+          items:
+            type: string
+        intent_id:
+          type: string
+        intent_type:
+          type:
+          - string
+          - 'null'
+        intent_name:
+          type:
+          - string
+          - 'null'
+        signal_type:
+          type:
+          - string
+          - 'null'
+        count_impressions:
+          type: integer
   parameters:
     sortIntents:
       name: sort
@@ -84,16 +190,6 @@ components:
         - `sort[count_impressions]=desc`'
       style: form
       explode: true
-    cursor:
-      name: cursor
-      in: query
-      required: false
-      description: 'Opaque pagination token from the previous response’s `nextCursor`. Omit on the first page.
-
-
-        Page size is controlled by the `limit` query parameter (default 200, maximum 1000).'
-      schema:
-        type: string
     filterIntents:
       name: filter
       in: query
@@ -135,6 +231,16 @@ components:
       explode: true
       schema:
         type: object
+    cursor:
+      name: cursor
+      in: query
+      required: false
+      description: 'Opaque pagination token from the previous response’s `nextCursor`. Omit on the first page.
+
+
+        Page size is controlled by the `limit` query parameter (default 200, maximum 1000).'
+      schema:
+        type: string
     listLimit:
       name: limit
       in: query
@@ -148,112 +254,6 @@ components:
         type: integer
         minimum: 1
         maximum: 1000
-  schemas:
-    Intent:
-      type: object
-      properties:
-        intent_event_id:
-          type: string
-        event_date:
-          type: string
-          format: date-time
-        channel_id:
-          type:
-          - string
-          - 'null'
-        vendor_id:
-          type:
-          - string
-          - 'null'
-        company_id:
-          type: string
-        audience_id_list:
-          type:
-          - array
-          - 'null'
-          items:
-            type: string
-        intent_id:
-          type: string
-        intent_type:
-          type:
-          - string
-          - 'null'
-        intent_name:
-          type:
-          - string
-          - 'null'
-        signal_type:
-          type:
-          - string
-          - 'null'
-        count_impressions:
-          type: integer
-    Error:
-      type: object
-      properties:
-        error:
-          type: string
-          description: Error class name
-        code:
-          type: string
-          description: Machine-readable error code (e.g. `err:pulsar.request.invalid-limit`, `err:pulsar.core.not-found`)
-          example: err:pulsar.request.invalid-limit
-        message:
-          type: string
-          description: Human-readable description
-      required:
-      - error
-      - code
-      - message
-    PaginatedIntents:
-      type: object
-      properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/Intent'
-        nextCursor:
-          type:
-          - string
-          - 'null'
-          description: Pass as the `cursor` query parameter to fetch the next page, or null when there are no more results.
-      required:
-      - data
-      - nextCursor
-  responses:
-    NotFound:
-      description: Not found – no matching route or resource (code `err:pulsar.core.not-found`)
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-    TooManyRequests:
-      description: 'Rate limit exceeded – too many requests from this client.
-
-
-        Limits:
-
-        - `POST /auth/token`: 20 req/min per `client_id` (app), plus WAF per-IP limit
-
-        - `/events/*` and `/dimensions/*`: burst limit of 100 req / 10s per client (app)
-
-        - All authenticated routes: WAF 60 req/s per `x-client-id` (5-minute window)
-
-        - `/ip/*` routes: WAF elevated tier (app burst limit does not apply)
-
-
-        App-level limits can be disabled via `PULSAR_APP_RATE_LIMITS=0|false|off` (WAF still applies).'
-      headers:
-        Retry-After:
-          description: Number of seconds to wait before retrying
-          schema:
-            type: integer
-            example: 60
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
   securitySchemes:
     bearerAuth:
       type: http

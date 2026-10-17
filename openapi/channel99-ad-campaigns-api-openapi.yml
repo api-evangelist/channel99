@@ -96,46 +96,6 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/Error'
-  schemas:
-    Error:
-      type: object
-      properties:
-        error:
-          type: string
-          description: Error class name
-        code:
-          type: string
-          description: Machine-readable error code (e.g. `err:pulsar.request.invalid-limit`, `err:pulsar.core.not-found`)
-          example: err:pulsar.request.invalid-limit
-        message:
-          type: string
-          description: Human-readable description
-      required:
-      - error
-      - code
-      - message
-    AdCampaignList:
-      type: object
-      properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/AdCampaign'
-      required:
-      - data
-    AdCampaign:
-      type: object
-      properties:
-        ad_campaign_id:
-          type: string
-        ad_campaign_name:
-          type: string
-        is_deleted:
-          type: boolean
-      required:
-      - ad_campaign_id
-      - ad_campaign_name
-      - is_deleted
   parameters:
     filterAdCampaigns:
       name: filter
@@ -174,6 +134,46 @@ components:
       explode: true
       schema:
         type: object
+  schemas:
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Error class name
+        code:
+          type: string
+          description: Machine-readable error code (e.g. `err:pulsar.request.invalid-limit`, `err:pulsar.core.not-found`)
+          example: err:pulsar.request.invalid-limit
+        message:
+          type: string
+          description: Human-readable description
+      required:
+      - error
+      - code
+      - message
+    AdCampaign:
+      type: object
+      properties:
+        ad_campaign_id:
+          type: string
+        ad_campaign_name:
+          type: string
+        is_deleted:
+          type: boolean
+      required:
+      - ad_campaign_id
+      - ad_campaign_name
+      - is_deleted
+    AdCampaignList:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/AdCampaign'
+      required:
+      - data
   securitySchemes:
     bearerAuth:
       type: http

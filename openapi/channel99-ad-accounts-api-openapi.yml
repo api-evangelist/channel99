@@ -114,15 +114,6 @@ components:
       - error
       - code
       - message
-    AdAccountList:
-      type: object
-      properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/AdAccount'
-      required:
-      - data
     AdAccount:
       type: object
       properties:
@@ -136,6 +127,15 @@ components:
       - ad_account_id
       - ad_account_name
       - is_deleted
+    AdAccountList:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/AdAccount'
+      required:
+      - data
   parameters:
     filterAdAccounts:
       name: filter

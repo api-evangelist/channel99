@@ -114,15 +114,6 @@ components:
       - error
       - code
       - message
-    ChannelList:
-      type: object
-      properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/Channel'
-      required:
-      - data
     Channel:
       type: object
       properties:
@@ -133,6 +124,15 @@ components:
       required:
       - channel_id
       - channel_name
+    ChannelList:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Channel'
+      required:
+      - data
   parameters:
     filterChannels:
       name: filter

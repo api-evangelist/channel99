@@ -97,19 +97,6 @@ components:
           schema:
             $ref: '#/components/schemas/Error'
   schemas:
-    Ad:
-      type: object
-      properties:
-        ad_id:
-          type: string
-        ad_name:
-          type: string
-        is_deleted:
-          type: boolean
-      required:
-      - ad_id
-      - ad_name
-      - is_deleted
     Error:
       type: object
       properties:
@@ -127,6 +114,19 @@ components:
       - error
       - code
       - message
+    Ad:
+      type: object
+      properties:
+        ad_id:
+          type: string
+        ad_name:
+          type: string
+        is_deleted:
+          type: boolean
+      required:
+      - ad_id
+      - ad_name
+      - is_deleted
     AdList:
       type: object
       properties:
